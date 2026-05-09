@@ -1,6 +1,6 @@
 const dblayer = require('../model/controller');
 const jwt = require('jsonwebtoken');
-
+//const { merge } = require('../routing/cart_routes');
 let service = {};
 
 service.registerUser = async (userData) => {
@@ -41,8 +41,9 @@ service.loginUser = async (logindetails) => {
         }
         const payload = { userId: user.id, role: user.role };
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-        //return { user: { userId: user.id, name: user.name, email: user.email, role: user.role }, token };
-        return { token };
+        return { user: { userId: user.id, name: user.name, email: user.email, role: user.role }, token };
+        // Merge guest cart with user cart after login
+;
     }
     catch(error){
         throw error;    
@@ -128,9 +129,9 @@ service.getBookById= async(id)=>{
     } };
 
 
-getOrCreateCart = async ({ userId, sessionId }) => {
+getOrCreateCart = async (userId, sessionId) => {
     try {
-        const cart = await dblayer.getOrCreateCart({ userId, sessionId });  
+        const cart = await dblayer.getOrCreateCart(userId, sessionId);  
         return cart;
     } catch (error) {
         throw error;
@@ -138,16 +139,48 @@ getOrCreateCart = async ({ userId, sessionId }) => {
 calculateTotalAmount = (items) => {
     return items.reduce((total, item) => total + item.quantity * item.priceAtAddTime, 0);
 };
+
+service.mergeCart = async (userId, sessionId) => {
+    console.log('Inside merge cart');
+    
+    try {
+        const guestCart = await dblayer.getCart({ sessionId }); // Get guest cart using sessionId   
+        if (!guestCart) return; // No guest cart to merge   
+        const userCart = await dblayer.getCart({ userId }); // Get user cart using userId
+        if (!userCart) {
+            guestCart.userId = userId;      
+            guestCart.sessionId = null; // Clear sessionId since it's now associated with a user
+            await guestCart.save();
+            return;
+        }
+        guestCart.items.forEach(guestItem => {
+        const existingItem = userCart.items.find(
+      item => item.bookId.toString() === guestItem.bookId.toString()
+      );
+
+      if (existingItem) {
+      existingItem.quantity += guestItem.quantity;
+      } else {
+      userCart.items.push(guestItem);
+      }
+     });
+        userCart.totalAmount = calculateTotalAmount(userCart.items);
+        await userCart.save();
+        await guestCart.deleteOne(); // Remove guest cart after merging
+    } catch (error) {
+        throw error;
+    }};
+
 service.addToCart = async (userId, sessionId, bookId, quantity) => {
     try{
-        const cart = await getOrCreateCart({ userId, sessionId });
-        const book = await getBookById(bookId);
+        const cart = await getOrCreateCart(userId, sessionId );
+        const book = await dblayer.getBookById(bookId);
         if (!book) {
           throw new Error('Book not found' );
         }   
         const existingitem = cart.items.find(item => item.bookId.toString() === bookId);
         if (existingitem) {
-          existingitem.quantity += quantity;
+          existingitem.quantity += Number(quantity);
         } else {
            cart.items.push({ bookId, quantity, priceAtAddTime: book.price });
         }
@@ -160,14 +193,15 @@ service.addToCart = async (userId, sessionId, bookId, quantity) => {
     }};
 service.getCart = async (userId, sessionId) => {
     try {
-        const cart = await dblayer.getCart({ userId, sessionId });  
-        return cart
+        const query = userId ? { userId } : { sessionId };
+        const cart = await dblayer.getCart(query);
+        return cart;
     } catch (error) {
         throw error;
     }};
 service.updateCart = async (userId, sessionId, bookId, quantity) => {
     try {
-        const cart = await dblayer.getCart({ userId, sessionId });
+        const cart = await service.getCart(userId, sessionId );
         if (!cart) {
             throw new Error('Cart not found');
         }       
@@ -175,7 +209,7 @@ service.updateCart = async (userId, sessionId, bookId, quantity) => {
         if (!item) {
             throw new Error('Book not found in cart');
         }       
-        item.quantity = quantity;
+        item.quantity = Number(quantity);
         cart.totalAmount = calculateTotalAmount(cart.items);
         await cart.save();
         return cart;
@@ -185,7 +219,7 @@ service.updateCart = async (userId, sessionId, bookId, quantity) => {
     }};
 service.removeCartItem = async (userId, sessionId, bookId) => {
     try {
-        const cart = await dblayer.getCart({ userId, sessionId });  
+        const cart = await service.getCart(userId, sessionId );  
         if (!cart) {
             throw new Error('Cart not found');
         }           

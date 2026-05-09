@@ -21,16 +21,19 @@ dblayer.getBooks = async (filter, sort) => {
 dblayer.getBookById = async (id) => {
     return await Book.findById(id);
 }  
-service.getOrCreateCart = async ({ userId, sessionId }) => {
-    const cart = await Cart.findOne({ $or: [{ userId }, { sessionId }] });
+dblayer.getOrCreateCart = async (userId, sessionId) => {
+    const cart = await Cart.findOne({ $or: [{userId: userId }, { sessionId: sessionId }] });
     if (cart) {
         return cart;
     }   
     const newCart = new Cart({ userId, sessionId, items: [], totalAmount: 0 });
     return await newCart.save();
 };
-dblayer.getCart = async (userId, sessionId) => {
-    const cart = await Cart.findOne({ $or: [{ userId }, { sessionId }] }).populate('items.bookId', 'title priceAtAddTime image totalAmount');
+dblayer.getCart = async (query) => {
+    const cart=  await Cart.findOne(query).populate('items.bookId', 'title priceAtAddTime image totalAmount');
+    console.log(`cart based on :${query} is : ${cart}`);
+    return cart;
+    
 
 };
 module.exports = dblayer;

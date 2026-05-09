@@ -5,6 +5,8 @@ const dotenv=require('dotenv');
 const connectDB=require('./config/db');
 const userRoutes=require('./routing/user_routes');
 const bookRoutes=require('./routing/books_routes');
+const cartRoutes=require('./routing/cart_routes');
+const cookieParser=require('cookie-parser');
 
 const app=express();
 
@@ -18,7 +20,8 @@ app.get('/',(req,res)=>{
 });
 app.use('/api/user',userRoutes);
 app.use('/api/collection',bookRoutes);
-
+app.use('/api/cart',cartRoutes);
+//console.log(`Connecting to database... ${process.env.MONGO_URI}`);
 const PORT = process.env.PORT || 3000;
 connectDB();
 app.listen(PORT, () => {

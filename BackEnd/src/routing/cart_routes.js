@@ -3,23 +3,32 @@ const routing = express.Router();
 const authMiddleware = require('../middleware/authmiddleware');
 const service = require('../service/controller');
 
-routing.post('/add',authMiddleware.validateGuestSession,async(req,res)=>{
+const public_routes    = [authMiddleware.optionalAuth, authMiddleware.validateGuestSession];
+const protected_routes = [authMiddleware.validateToken];
+
+routing.post('/add',...public_routes,async(req,res)=>{
     const { bookId, quantity } = req.body;
-    const userId = req.user ? req.user.userId : null; // Get user ID if authenticated  
+    const userId = req.user ? req.user._id: null; // Get user ID if authenticated  
     const sessionId = req.sessionId;
 
     try {
          const cart= await service.addToCart(userId, sessionId, bookId, quantity);
-         res.status(200).json({message: "Item Successfully added",result});
+         res.status(200).json({message: "Item Successfully added",cart});
     } catch (error) {
         console.log(error);
         res.status(400).json({ message: error.message });
     }           
 });
- routing .get('/',authMiddleware.validateGuestSession,async(req,res)=>{
-    const userId = req.user? req.user.userId : null; // Get user ID if authenticated
+
+routing.get('',...public_routes,async(req,res)=>{
+    console.log('entered in routing...getCart');
+    
+    const userId = req.user? req.user._id : null; // Get user ID if authenticated
+    console.log(`userid: ${userId}`);
     const sessionId = req.sessionId;
-    try {
+    console.log(sessionId);
+
+    try {   
         const cartItems = await service.getCart(userId, sessionId);
         res.status(200).json({ cartItems });
     } catch (error) {
@@ -27,9 +36,9 @@ routing.post('/add',authMiddleware.validateGuestSession,async(req,res)=>{
         res.status(400).json({ message: error.message });
     }  });
 
- routing.patch('/update',authMiddleware.validateGuestSession,async(req,res)=>{
+ routing.patch('/update',...public_routes,async(req,res)=>{
     const { bookId, quantity } = req.body;
-    const userId = req.user ? req.user.userId : null; // Get user ID if authenticated
+    const userId = req.user ? req.user._id : null; // Get user ID if authenticated
     const sessionId = req.sessionId;        
     try {
         const cart= await service.updateCart(userId, sessionId, bookId, quantity);
@@ -38,9 +47,9 @@ routing.post('/add',authMiddleware.validateGuestSession,async(req,res)=>{
         console.log(error);
         res.status(400).json({ message: error.message });
     }}); 
-routing.delete('/remove',authMiddleware.validateGuestSession,async(req,res)=>{
+routing.delete('/remove',...public_routes,async(req,res)=>{
     const { bookId } = req.body;
-    const userId = req.user ? req.user.userId : null; // Get user ID if authenticated
+    const userId = req.user ? req.user._id : null; // Get user ID if authenticated
     const sessionId = req.sessionId;            
     try {
         const cart = await service.removeCartItem(userId, sessionId, bookId);

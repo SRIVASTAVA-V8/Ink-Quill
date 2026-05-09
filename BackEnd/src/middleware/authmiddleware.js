@@ -20,18 +20,19 @@ dotenv.config();
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = await User.findById(decoded.userId).select('-password'); // Fetch user details from DB
         console.log(req.user);
-         // *transoform to service & controller
         next();
     } catch (error) {
         return res.status(400).json({ message: 'Invalid token.' });
     }
 };
-authMiddleware.validateGuestSession = (req, res, next) => {
+authMiddleware.validateGuestSession = async(req, res, next) => {
+    console.log('entered in Validate Guest Session');
+    
     if (req.user) {
         req.sessionId = null; // Authenticated users don't need a session ID
         return next(); // User is authenticated, proceed to the next middleware or route handler
     }
-    const sessionId = req.cookies['sessionId'];
+    let sessionId = req.cookies['sessionId'];
     if (!sessionId) {
         sessionId = uuidv4();
         res.cookie('sessionId', sessionId, { httpOnly: true,secure:false, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 1 week
@@ -42,5 +43,31 @@ authMiddleware.validateGuestSession = (req, res, next) => {
     req.sessionId = sessionId;
     next();
 }
+authMiddleware.optionalAuth = async (req, res, next) => {
+    console.log("entered optional auth middleware");
+    
+  try {
+    const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.log('authHeader not right');      
+      req.user = null; // Guest
+      return next();
+    }
 
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('decoded', decoded);
+    
+    const user = await User.findById(decoded.userId).select('-password');
+    console.log('Found user:', user);
+
+    req.user = user || null;
+    console.log('user assigned in optional auth',req.user);
+    
+  } catch (err) {
+    // Expired/invalid token → treat as guest, don't block
+    req.user = null;
+  }
+  next();
+};
 module.exports = authMiddleware;

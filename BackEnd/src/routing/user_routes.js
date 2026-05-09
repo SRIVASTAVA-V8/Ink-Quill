@@ -5,6 +5,7 @@ dotenv.config();
 const routing = express.Router();
 const authMiddleware = require('../middleware/authmiddleware');
 const service = require('../service/controller');
+//const mergeCart= require ('../service/controller').mergeCart;
 
 // Create a new user
 routing.post('/register', async (req, res) => {
@@ -18,8 +19,11 @@ routing.post('/register', async (req, res) => {
 
 routing.post('/login', async (req, res) => {
        const logindetails = req.body;
+       console.log("session id while logging ",req.cookies['sessionId']);
+       
        try {
-           const result = await service.loginUser(logindetails);
+           const result = await service.loginUser(logindetails);         
+           await service.mergeCart(result.user.userId, req.cookies['sessionId']);
            res.status(200).json(result);
        } catch (error) {
            console.log(error);
