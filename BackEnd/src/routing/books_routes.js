@@ -11,9 +11,9 @@ routing.get ('/:collection',async (req, res) => {
      console.log(req.params.collection);
      console.log(req.query);
      let collection=req.params.collection;    
-     const {category,search,language,author,min_price,max_price,sortby,exclude} = req.query;    
+     const {category,search,language,author,min_price,max_price,sortby,exclude,page,limit} = req.query;    
      try{
-       const books = await service.getBooks({ collection, category, search, language, author, min_price, max_price, sortby, exclude });
+       const books = await service.getBooks({ collection, category, search, language, author, min_price, max_price, sortby, exclude, page, limit });
         res.status(200).json({ books });
      }
      catch (error) {
@@ -35,6 +35,7 @@ routing.get('/item/:id',async(req,res)=>{
     res.status(400).json({ message: error.message });
   }
 });
+
  
 
 module.exports = routing;

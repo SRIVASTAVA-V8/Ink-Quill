@@ -24,6 +24,7 @@ routing.post('/login', async (req, res) => {
        try {
            const result = await service.loginUser(logindetails);         
            await service.mergeCart(result.user.userId, req.cookies['sessionId']);
+           await service.mergeWishlist(result.user.userId, req.cookies['sessionId']);
            res.status(200).json(result);
        } catch (error) {
            console.log(error);
@@ -36,10 +37,14 @@ routing.post('/login', async (req, res) => {
   });
 
 
-routing.get ('/profile',authMiddleware.validateToken, async (req, res) => {     
-     res.status(200).json({ user: req.user });
+routing.get ('/profile',authMiddleware.validateToken, async (req, res) => {   
+    try {
+        const profile = await service.getProfile(req.user._id);
+        res.status(200).json(profile);
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ message: error.message });
+    }     
    });
-
-
 
 module.exports = routing;

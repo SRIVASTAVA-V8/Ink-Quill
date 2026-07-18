@@ -1,0 +1,39 @@
+<div class="mt-12 pt-8 border-t">
+      <h3 class="text-2xl font-bold mb-6">Customer Reviews</h3>
+      
+      <!-- Write Review -->
+      <div *ngIf="isLoggedIn" class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 mb-8">
+        <h4 class="font-semibold text-lg mb-4">Write a Review</h4>
+        <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+          <div class="mb-4">
+            <label class="block mb-2">Rating</label>
+            <div class="flex gap-2">
+              <button *ngFor="let star of [1,2,3,4,5]" type="button"
+                      (click)="setRating(star)" class="text-2xl">
+                {{ star <= rating ? '★' : '☆' }}
+              </button>
+            </div>
+          </div>
+          <div class="mb-4">
+            <textarea formControlName="comment" rows="4" 
+                      placeholder="Share your thoughts about this book..."
+                      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Submit Review</button>
+        </form>
+      </div>
+      
+      <!-- Reviews List -->
+      <div class="space-y-6">
+        <div *ngFor="let review of reviews" class="border-b pb-6">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="font-semibold">{{ review.userName }}</span>
+            <div class="flex text-yellow-500">
+              <span *ngFor="let s of [1,2,3,4,5]">★</span>
+            </div>
+            <span class="text-sm text-gray-500">{{ review.date | date }}</span>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">{{ review.comment }}</p>
+        </div>
+      </div>
+    </div>

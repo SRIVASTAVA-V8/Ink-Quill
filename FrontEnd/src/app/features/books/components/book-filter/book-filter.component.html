@@ -1,0 +1,44 @@
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 sticky top-24">
+      <h3 class="text-xl font-bold mb-4">Filters</h3>
+      
+      <!-- Category Filter -->
+      <div class="mb-6">
+        <h4 class="font-semibold mb-3">Category</h4>
+        <div class="space-y-2">
+          <label *ngFor="let cat of categories" class="flex items-center cursor-pointer">
+            <input type="radio" name="category" [value]="cat" 
+                   (change)="onCategoryChange(cat)" class="mr-3">
+            <span>{{ cat }}</span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Price Range -->
+      <div class="mb-6">
+        <h4 class="font-semibold mb-3">Price Range</h4>
+        <div class="space-y-3">
+          <input type="range" min="0" max="100" [(ngModel)]="maxPrice" 
+                 (change)="onPriceChange()" class="w-full">
+          <div class="flex justify-between text-sm">
+            <span>$0</span>
+            <span>${{ maxPrice }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Rating Filter -->
+      <div class="mb-6">
+        <h4 class="font-semibold mb-3">Minimum Rating</h4>
+        <div class="space-y-2">
+          <label *ngFor="let rating of [4, 3, 2, 1]" class="flex items-center cursor-pointer">
+            <input type="radio" name="rating" [value]="rating" 
+                   (change)="onRatingChange(rating)" class="mr-3">
+            <span>{{ rating }} ★ & up</span>
+          </label>
+        </div>
+      </div>
+      
+      <button (click)="clearFilters()" class="w-full text-indigo-600 hover:text-indigo-700">
+        Clear All Filters
+      </button>
+    </div>

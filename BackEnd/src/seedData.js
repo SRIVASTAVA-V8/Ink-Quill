@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+const hashedPassword = await bcrypt.hash("Password123", 10)
 const seedData = {
   books: [
     {
@@ -293,7 +295,7 @@ const seedData = {
     {
       name: 'Chakshu',
       email: 'chakshu@gmail.com',
-      password: 'Password123',
+      password: hashedPassword,
       role: 'user',
       address: {
         fullName: 'Chakshu Sharma',
@@ -305,13 +307,12 @@ const seedData = {
         country: 'India',
         isDefault: true
       },
-      wishlist: [], // Will be populated with book IDs after insertion
       isActive: true
     },
     {
       name: 'Riya',
       email: 'riya@example.com',
-      password: 'Password123',
+      password: hashedPassword,
       role: 'user',
       address: {
         fullName: 'Riya Patel',
@@ -323,7 +324,7 @@ const seedData = {
         country: 'India',
         isDefault: true
       },
-      wishlist: [], // Will be populated with book IDs after insertion
+
       isActive: true
     }
   ],

@@ -1,0 +1,51 @@
+<div class="p-10">
+
+  <h2 class="text-4xl font-bold mb-8">
+    Welcome Back
+  </h2>
+
+  <form class="space-y-5">
+
+    <input
+      type="email"
+      placeholder="Email"
+      class="w-full border p-4 rounded-xl"
+    >
+
+    <input
+      type="password"
+      placeholder="Password"
+      class="w-full border p-4 rounded-xl"
+    >
+
+    <div class="text-right">
+      <a
+        routerLink="/auth/forgot-password"
+        class="text-amber-500"
+      >
+        Forgot Password?
+      </a>
+    </div>
+
+    <button
+      class="w-full bg-black text-white py-4 rounded-xl"
+    >
+      Login
+    </button>
+
+  </form>
+
+  <p class="mt-6 text-center">
+
+    Don't have an account?
+
+    <a
+      routerLink="/auth/register"
+      class="text-amber-500 font-semibold"
+    >
+      Register
+    </a>
+
+  </p>
+
+</div>

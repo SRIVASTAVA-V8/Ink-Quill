@@ -1,0 +1,39 @@
+// middleware/validateOrder.js
+const Joi = require('joi');
+
+const addressSchema = Joi.object({
+  fullName: Joi.string().required(),
+  phone:    Joi.string().pattern(/^[6-9]\d{9}$/).required(),
+  line1:    Joi.string().required(),
+  line2:    Joi.string().allow(''),
+  city:     Joi.string().required(),
+  state:    Joi.string().required(),
+  pincode:  Joi.string().pattern(/^\d{6}$/).required(),
+  country:  Joi.string().default('India'),
+});
+
+module.exports = (req, res, next) => {
+  const schema = Joi.object({
+    shippingAddress: addressSchema.required(),
+
+    paymentMethod: Joi.string()
+      .valid('cod', 'upi', 'card', 'wallet')
+      .required(),
+
+    // UPI id only required when method is upi
+    upiId: Joi.when('paymentMethod', {
+      is:        'upi',
+      then:      Joi.string().pattern(/^[\w.\-]{2,256}@[a-zA-Z]{2,64}$/).required(),
+      otherwise: Joi.forbidden(),
+    }),
+  });
+
+  const { error } = schema.validate(req.body, { abortEarly: false });
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      errors: error.details.map(d => d.message),
+    });
+  }
+  next();
+};

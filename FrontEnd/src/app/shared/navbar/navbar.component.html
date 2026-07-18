@@ -1,0 +1,53 @@
+<nav class="bg-white dark:bg-gray-900 shadow-lg sticky top-0 z-50">
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex justify-between items-center">
+          <!-- Logo -->
+          <a routerLink="/" class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            BookNest
+          </a>
+          
+          <!-- Desktop Menu -->
+          <div class="hidden md:flex items-center space-x-8">
+            <a routerLink="/" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 transition">Home</a>
+            <a routerLink="/books" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 transition">Books</a>
+            <a routerLink="/wishlist" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 transition">
+              Wishlist ({{ wishlistCount }})
+            </a>
+          </div>
+          
+          <!-- Right Section -->
+          <div class="flex items-center space-x-4">
+            <!-- Cart -->
+            <button routerLink="/cart" class="relative">
+              <span class="text-2xl">🛒</span>
+              <span class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {{ cartCount }}
+              </span>
+            </button>
+            
+            <!-- User Menu -->
+            <div *ngIf="!(isLoggedIn$ | async); else userMenu" class="flex space-x-2">
+              <button routerLink="/auth/login" class="text-indigo-600 hover:text-indigo-700">Login</button>
+              <button routerLink="/auth/register" class="btn-primary">Sign Up</button>
+            </div>
+            
+            <ng-template #userMenu>
+              <div class="relative" appClickOutside (clickOutside)="closeUserMenu()">
+                <button (click)="toggleUserMenu()" class="flex items-center space-x-2">
+                  <span class="text-2xl">👤</span>
+                  <span>{{ (currentUser$ | async)?.name }}</span>
+                </button>
+                <div *ngIf="userMenuOpen" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl py-2">
+                  <a routerLink="/profile" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
+                  <a routerLink="/orders" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">My Orders</a>
+                  <a *ngIf="isAdmin" routerLink="/admin" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Admin Panel</a>
+                  <button (click)="logout()" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </nav>

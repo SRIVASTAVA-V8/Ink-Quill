@@ -1,0 +1,41 @@
+<div class="container mx-auto px-6 py-8">
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Filters Sidebar -->
+        <div class="lg:w-80">
+          <app-filters (filtersChanged)="applyFilters($event)"></app-filters>
+        </div>
+        
+        <!-- Books Grid -->
+        <div class="flex-1">
+          <!-- Sort & Search -->
+          <div class="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+            <app-sort (sortChanged)="applySort($event)"></app-sort>
+            <div class="relative">
+              <input type="text" 
+                     [(ngModel)]="searchTerm"
+                     (input)="searchBooks()"
+                     placeholder="Search books..." 
+                     class="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+          
+          <!-- Loading State -->
+          <div *ngIf="loading" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          </div>
+          
+          <!-- Books Grid using Book Card Component -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <app-book-card *ngFor="let book of displayedBooks" 
+                           [book]="book"
+                           (bookAction)="handleBookAction($event)">
+            </app-book-card>
+          </div>
+          
+          <!-- Empty State -->
+          <div *ngIf="!loading && displayedBooks.length === 0" class="text-center py-12">
+            <p class="text-gray-500 text-lg">No books found. Try adjusting your filters.</p>
+          </div>
+        </div>
+      </div>
+    </div>

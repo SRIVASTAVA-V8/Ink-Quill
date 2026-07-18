@@ -32,7 +32,6 @@ const users= mongoose.Schema({
       country: { type: String, default: 'India' },
       isDefault: { type: Boolean, default: false }
     },
-    wishlist: [ { type: mongoose.Schema.Types.ObjectId, ref: "Book" } ], // Array of book IDs (references Books collection)
     isActive: { type: Boolean, default: true },       
     createdAt: {                 // Account creation date
       type: Date,

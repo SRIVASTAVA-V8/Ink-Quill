@@ -1,6 +1,8 @@
+const { default: mongoose } = require('mongoose');
 const dblayer = require('../model/controller');
 const jwt = require('jsonwebtoken');
 //const { merge } = require('../routing/cart_routes');
+
 let service = {};
 
 service.registerUser = async (userData) => {
@@ -49,8 +51,21 @@ service.loginUser = async (logindetails) => {
         throw error;    
     }
 };
+service.getProfile = async (userId) => {
+    try {
+        const user = await dblayer.getProfile(userId);           
+        if (!user) {                
+            throw new Error('User not found');
+        }
+    }
+        catch (error) { 
+        throw error;
+    }}
+;
+
         
-service.getBooks= async({ collection, category, search, language, author, min_price, max_price, sortby ,exclude})=>{
+service.getBooks= async({ collection, category, search, language, author, min_price, max_price, sortby ,exclude, page, limit })=>{
+   const skip = (page - 1) * limit;
     let warningMessage = null;
 if (
   collection !== 'all' &&
@@ -111,7 +126,7 @@ if (
     }   
 
     try{
-        const books = await dblayer.getBooks(filter,sort);
+        const books = await dblayer.getBooks(filter,sort, page, limit,skip);
         return {warningMessage, books};
     }
     catch(error){
@@ -171,9 +186,38 @@ service.mergeCart = async (userId, sessionId) => {
         throw error;
     }};
 
+service.mergeWishlist = async (userId, sessionId) => {
+    console.log('Inside merge wishlist');
+    
+    try {
+        const guestWishlist = await dblayer.getWishlist({ sessionId }); // Get guest wishlist using sessionId
+        if (!guestWishlist) return; // No guest wishlist to merge
+        const userWishlist = await dblayer.getWishlist({ userId }); // Get user wishlist using userId
+        if (!userWishlist) {
+            guestWishlist.userId = userId;
+            guestWishlist.sessionId = null; // Clear sessionId since it's now associated with a user
+            await dblayer.updateWishlist(guestWishlist);
+            return;
+        }
+        guestWishlist.items.forEach(guestItem => {
+            const existingItem = userWishlist.items.find(
+                item => item.bookId.toString() === guestItem.bookId.toString()
+            );
+
+            if (!existingItem) {
+                userWishlist.items.push(guestItem);
+            }
+        });
+        userWishlist.updatedAt = new Date();
+        await dblayer.updateWishlist(userWishlist);
+        await guestWishlist.deleteOne(); // Remove guest wishlist after merging
+    } catch (error) {
+        throw error;
+    }};
+
 service.addToCart = async (userId, sessionId, bookId, quantity) => {
     try{
-        const cart = await getOrCreateCart(userId, sessionId );
+        const cart = await dblayer.getOrCreateCart(userId, sessionId );
         const book = await dblayer.getBookById(bookId);
         if (!book) {
           throw new Error('Book not found' );
@@ -201,7 +245,7 @@ service.getCart = async (userId, sessionId) => {
     }};
 service.updateCart = async (userId, sessionId, bookId, quantity) => {
     try {
-        const cart = await service.getCart(userId, sessionId );
+        const cart = await dblayer.getCart(userId, sessionId );
         if (!cart) {
             throw new Error('Cart not found');
         }       
@@ -219,7 +263,7 @@ service.updateCart = async (userId, sessionId, bookId, quantity) => {
     }};
 service.removeCartItem = async (userId, sessionId, bookId) => {
     try {
-        const cart = await service.getCart(userId, sessionId );  
+        const cart = await dblayer.getCart(userId, sessionId );  
         if (!cart) {
             throw new Error('Cart not found');
         }           
@@ -227,6 +271,104 @@ service.removeCartItem = async (userId, sessionId, bookId) => {
         cart.totalAmount = calculateTotalAmount(cart.items);
         await cart.save();
         return cart;
+    } catch (error) {
+        throw error;
+    }};
+
+// Wishlist service functions
+service.getOrCreateWishlist = async (userId, sessionId) => {
+    try {
+        const wishlist = await dblayer.getOrCreateWishlist(userId, sessionId);  
+        return wishlist;
+    } catch (error) {
+        throw error;
+    }};
+
+service.addToWishlist = async (userId, sessionId, bookId) => {
+    try {
+        const wishlist = await  service.getOrCreateWishlist(userId, sessionId);
+        const book = await dblayer.getBookById(bookId);
+        if (!book) {
+            throw new Error('Book not found');
+        }
+        
+        const existingItem = wishlist.items.find(item => item.bookId.toString() === bookId);
+        if (existingItem) {
+            throw new Error('Book already in wishlist');
+        }
+        
+        wishlist.items.push({ bookId });
+        wishlist.updatedAt = new Date();
+        await dblayer.updateWishlist(wishlist);
+        return wishlist;
+    } catch (error) {
+        throw error;
+    }};
+
+service.getWishlist = async (userId, sessionId,page, limit) => {
+    try {
+        const query = userId ? { userId } : { sessionId };
+        const skip= (page - 1) * limit;
+        const wishlist = await dblayer.getWishlist(query, page, limit, skip);
+        return wishlist;
+    } catch (error) {
+        throw error;
+    }};
+
+service.removeFromWishlist = async (userId, sessionId, bookId) => {
+    try {
+        const wishlist = await dblayer.getWishlist(userId, sessionId);
+        if (!wishlist) {
+            throw new Error('Wishlist not found');
+        }
+        
+        wishlist.items = wishlist.items.filter(item => item.bookId.toString() !== bookId);
+        wishlist.updatedAt = new Date();
+        await dblayer.updateWishlist(wishlist);
+        return wishlist;
+    } catch (error) {
+        throw error;
+    }};
+
+service.isInWishlist = async (userId, sessionId, bookId) => {
+    try {
+        const wishlist = await dblayer.getWishlist(userId, sessionId);
+        if (!wishlist) {
+            return false;
+        }
+        
+        const isPresent = wishlist.items.some(item => item.bookId.toString() === bookId);
+        return isPresent;
+    } catch (error) {
+        throw error;
+    }};
+
+service.getWishlistCount = async (userId, sessionId) => {
+    try {
+        const wishlist = await dblayer.getWishlist(userId, sessionId);
+        if (!wishlist) {
+            return 0;
+        }
+        return wishlist.items.length;
+    } catch (error) {
+        throw error;
+    }};
+
+service.moveToCart = async (userId, sessionId, bookId) => {
+    try {
+        // Check if book is in wishlist
+        const isInWishlist = await service.isInWishlist(userId, sessionId, bookId);
+        if (!isInWishlist) {
+            throw new Error('Book not found in wishlist');
+        }
+
+        // Add book to cart (quantity 1)
+        const cart = await dblayer.addToCart(userId, sessionId, bookId, 1);
+
+        // Remove book from wishlist
+        const wishlist = await service.removeFromWishlist(userId, sessionId, bookId);
+
+        return { cart, wishlist };
     } catch (error) {
         throw error;
     }};

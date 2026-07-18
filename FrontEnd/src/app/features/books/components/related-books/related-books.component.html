@@ -1,0 +1,53 @@
+ <div *ngIf="relatedBooks" class="mt-16">
+      <!-- Same Author -->
+      <div *ngIf="relatedBooks.bySameAuthor.length > 0" class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-bold">More by {{ author }}</h2>
+            <p class="text-gray-600 dark:text-gray-400">Other books from this author</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <app-book-card *ngFor="let book of relatedBooks.bySameAuthor" 
+                         [book]="book" 
+                         [compact]="true">
+          </app-book-card>
+        </div>
+      </div>
+
+      <!-- Bestsellers in Category -->
+      <div *ngIf="relatedBooks.bestsellersInCategory.length > 0" class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-bold flex items-center gap-2">
+              <span>🏆</span> Bestsellers in {{ category }}
+            </h2>
+            <p class="text-gray-600 dark:text-gray-400">Top-rated books in this genre</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <app-book-card *ngFor="let book of relatedBooks.bestsellersInCategory" 
+                         [book]="book" 
+                         [compact]="true">
+          </app-book-card>
+        </div>
+      </div>
+
+      <!-- Recommended -->
+      <div *ngIf="relatedBooks.recommendedForYou.length > 0" class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-bold flex items-center gap-2">
+              <span>🎯</span> Recommended For You
+            </h2>
+            <p class="text-gray-600 dark:text-gray-400">Personalized recommendations</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <app-book-card *ngFor="let book of relatedBooks.recommendedForYou" 
+                         [book]="book" 
+                         [compact]="true">
+          </app-book-card>
+        </div>
+      </div>
+    </div>

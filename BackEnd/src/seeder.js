@@ -20,9 +20,6 @@ const seedDataFunction = async () => {
     const books = await Book.insertMany(seedData.books);
     const [book1, book2, book3] = books;
 
-    // Update user wishlists with book IDs
-    seedData.users[0].wishlist = [book1._id, book2._id];
-    seedData.users[1].wishlist = [book3._id];
 
     const users = [];
     for (const userData of seedData.users) {

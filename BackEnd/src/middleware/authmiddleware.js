@@ -18,7 +18,7 @@ dotenv.config();
     }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = await User.findById(decoded.userId).select('-password'); // Fetch user details from DB
+        req.user = await User.findById(decoded.userId).select('_id, name, email ,role'); // Fetch user details from DB
         console.log(req.user);
         next();
     } catch (error) {
@@ -70,4 +70,11 @@ authMiddleware.optionalAuth = async (req, res, next) => {
   }
   next();
 };
+authMiddleware.checkAdminRole = (req, res, next) => {
+    if (req.user && req.user.role === 'admin') {
+        return next();
+    }   
+    return res.status(403).json({ message: 'Admin access required.' });
+};
+
 module.exports = authMiddleware;
