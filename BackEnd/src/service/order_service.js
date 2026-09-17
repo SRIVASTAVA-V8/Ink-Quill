@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const dblayer = require('../model/controller');
-const razorpayService = require('./razorpay_service');
+const razorpayService = require('./razorpayService');
 const jwt = require('jsonwebtoken');
 let orderService = {};
 const SHIPPING_THRESHOLD = 500;
@@ -124,7 +124,7 @@ orderService.checkOut = async (userId, paymentMethod, shippingAddress) => {
             shippingAddress,
             ...pricing,
            paymentInfo: {
-              method: 'paymentMethod', // This should be replaced with actual payment method details
+              method: paymentMethod, // This should be replaced with actual payment method details
               status: 'pending',       // Update based on payment gateway response
            },
            orderStatus: 'placed',
@@ -200,7 +200,7 @@ orderService.checkOut = async (userId, paymentMethod, shippingAddress) => {
         try{
             await session.startTransaction();
             const cart= await dblayer.getCart({ userId }, { session });
-            constbulkOps= order.items.map(item=>({
+            const bulkOps= order.items.map(item=>({
               updateOne:{
                filter:{_id: item.book, stock: { $gte: item.quantity }},
                update:{ $inc: { stock: -item.quantity }},

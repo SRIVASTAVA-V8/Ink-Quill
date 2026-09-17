@@ -10,7 +10,7 @@ export class BookFilterComponent {
   
   categories = ['All', 'Fiction', 'Non-Fiction', 'Sci-Fi', 'Biography', 'Romance', 'Mystery', 'Fantasy'];
   selectedCategory = 'All';
-  maxPrice = 100;
+  maxPrice : number|null= null
   selectedRating = 0;
 
   onCategoryChange(category: string) {
@@ -29,7 +29,7 @@ export class BookFilterComponent {
 
   clearFilters() {
     this.selectedCategory = 'All';
-    this.maxPrice = 100;
+    this.maxPrice = null;
     this.selectedRating = 0;
     this.emitFilters();
   }
@@ -37,7 +37,7 @@ export class BookFilterComponent {
   private emitFilters() {
     this.filtersChanged.emit({
       category: this.selectedCategory === 'All' ? null : this.selectedCategory,
-      minPrice: 0,
+      minPrice: null,
       maxPrice: this.maxPrice,
       rating: this.selectedRating || null
     });

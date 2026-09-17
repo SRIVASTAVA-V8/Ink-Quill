@@ -44,28 +44,34 @@ authMiddleware.validateGuestSession = async(req, res, next) => {
     next();
 }
 authMiddleware.optionalAuth = async (req, res, next) => {
-    console.log("entered optional auth middleware");
+    console.log("=========== OPTIONAL AUTH =========");
     
   try {
     const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+    console.log('Authorization Header:', authHeader);
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        console.log('authHeader not right');      
+        console.log('Not valid Auth Header');      
       req.user = null; // Guest
       return next();
     }
 
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('decoded', decoded);
+    console.log('decoded JWT:', decoded);
     
     const user = await User.findById(decoded.userId).select('-password');
     console.log('Found user:', user);
 
     req.user = user || null;
-    console.log('user assigned in optional auth',req.user);
+    console.log('req.user assigned:',req.user);
     
   } catch (err) {
-    // Expired/invalid token → treat as guest, don't block
+    console.error(
+      'OPTIONAL AUTH ERROR:',
+      err
+    );
+    
+  console.log('===================================');
     req.user = null;
   }
   next();

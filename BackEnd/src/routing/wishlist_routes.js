@@ -1,12 +1,13 @@
 const express = require('express');
 const routing = express.Router();
 const authMiddleware = require('../middleware/authmiddleware');
-const service = require('../service/controller');
+const service = require('../service/wishlist_service');
 
 const public_routes = [authMiddleware.optionalAuth, authMiddleware.validateGuestSession];
 
 // Add book to wishlist
 routing.post('/add', ...public_routes, async (req, res) => {
+    console.log('entered in routing...addToWishlist', req.body);
     const { bookId } = req.body;
     const userId = req.user ? req.user._id : null;
     const sessionId = req.sessionId;
@@ -51,34 +52,6 @@ routing.delete('/remove', ...public_routes, async (req, res) => {
     }
 });
 
-// Check if book is in wishlist
-routing.get('/check/:bookId', ...public_routes, async (req, res) => {
-    const { bookId } = req.params;
-    const userId = req.user ? req.user._id : null;
-    const sessionId = req.sessionId;
-
-    try {
-        const isInWishlist = await service.isInWishlist(userId, sessionId, bookId);
-        res.status(200).json({ isInWishlist });
-    } catch (error) {
-        console.log(error);
-        res.status(400).json({ message: error.message });
-    }
-});
-
-// Get wishlist count
-routing.get('/count', ...public_routes, async (req, res) => {
-    const userId = req.user ? req.user._id : null;
-    const sessionId = req.sessionId;
-
-    try {
-        const count = await service.getWishlistCount(userId, sessionId);
-        res.status(200).json({ count });
-    } catch (error) {
-        console.log(error);
-        res.status(400).json({ message: error.message });
-    }
-});
 
 // Move book from wishlist to cart
 routing.post('/move-to-cart', ...public_routes, async (req, res) => {
@@ -97,6 +70,23 @@ routing.post('/move-to-cart', ...public_routes, async (req, res) => {
         console.log(error);
         res.status(400).json({ message: error.message });
     }
+});
+routing.delete('/clear', ...public_routes, async (req, res) => {
+  const userId = req.user ? req.user._id : null;
+  const sessionId = req.sessionId;
+
+  try {
+    const wishlist = await service.clearWishlist(userId, sessionId);
+
+    res.status(200).json({
+      message: 'Wishlist cleared successfully',
+      wishlist
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message
+    });
+  }
 });
 
 

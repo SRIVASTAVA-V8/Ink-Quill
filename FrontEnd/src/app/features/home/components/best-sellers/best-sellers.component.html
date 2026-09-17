@@ -1,43 +1,16 @@
-<section class="py-20 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+<section class="py-20 bg-background">
       <div class="container mx-auto px-6">
         <div class="text-center mb-12">
-          <h2 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+          <h2 class="text-4xl font-bold text-primary mb-4">
             🏆 Bestsellers
           </h2>
-          <p class="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
+          <p class="text-body dark:text-gray-400 text-lg max-w-2xl mx-auto">
             Most popular books loved by our community
           </p>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div *ngFor="let book of bestsellers" 
-               class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all cursor-pointer group"
-               [routerLink]="['/books', book._id]">
-            <div class="relative overflow-hidden">
-              <img [src]="book.image[0]" [alt]="book.title" 
-                   class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500">
-              <div class="absolute top-4 right-4 bg-yellow-400 text-gray-900 px-3 py-1 rounded-full text-sm font-bold">
-                ★ {{ book.ratingAvg }}
-              </div>
-              <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold" *ngIf="book.discount > 0">
-                -{{ book.discount }}%
-              </div>
-            </div>
-            <div class="p-5">
-              <h3 class="text-lg font-bold mb-2 group-hover:text-indigo-600 transition">{{ book.title }}</h3>
-              <p class="text-gray-600 dark:text-gray-400 mb-2">{{ book.author }}</p>
-              <div class="flex justify-between items-center">
-                <div>
-                  <span class="text-2xl font-bold text-indigo-600">\${{ getDiscountedPrice(book) }}</span>
-                  <span *ngIf="book.discount > 0" class="ml-2 text-sm text-gray-500 line-through">\${{ book.price }}</span>
-                </div>
-                <button (click)="addToCart(book._id); $event.stopPropagation()" 
-                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                  Add
-                </button>
-              </div>
-            </div>
-          </div>
+          <app-book-card *ngFor="let book of bestsellers" [book]="book"></app-book-card>
         </div>
       </div>
     </section>

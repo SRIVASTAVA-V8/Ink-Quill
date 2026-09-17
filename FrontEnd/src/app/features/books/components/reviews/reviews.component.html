@@ -2,7 +2,7 @@
       <h3 class="text-2xl font-bold mb-6">Customer Reviews</h3>
       
       <!-- Write Review -->
-      <div *ngIf="isLoggedIn" class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 mb-8">
+      <div *ngIf="isLoggedIn" class="bg-background dark:bg-gray-800 rounded-xl p-6 mb-8">
         <h4 class="font-semibold text-lg mb-4">Write a Review</h4>
         <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
           <div class="mb-4">
@@ -33,7 +33,7 @@
             </div>
             <span class="text-sm text-gray-500">{{ review.date | date }}</span>
           </div>
-          <p class="text-gray-600 dark:text-gray-400">{{ review.comment }}</p>
+          <p class="text-body dark:text-gray-400">{{ review.comment }}</p>
         </div>
       </div>
     </div>

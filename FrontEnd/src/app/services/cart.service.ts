@@ -1,24 +1,23 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import{Book} from '../models/book.model';
+import { BehaviorSubject, Observable, of,  map,tap } from 'rxjs';
 import { Cart, CartItem } from '../models/cart.model';
-import { BookService } from './book.service';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
+  private readonly API_URL = 'http://localhost:3000/api/cart'
   private cartSubject = new BehaviorSubject<Cart>(this.initializeCart());
   public cart$ = this.cartSubject.asObservable();
 
-  constructor(private bookService: BookService) {
-    this.loadCartFromStorage();
-  }
+  constructor(private http: HttpClient){}
+  
 
   private initializeCart(): Cart {
     return {
       userId: null,
-      sessionId: this.generateSessionId(),
+      sessionId: '',
       items: [],
       totalAmount: 0,
       createdAt: new Date(),
@@ -26,88 +25,110 @@ export class CartService {
     };
   }
 
-  private generateSessionId(): string {
-    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  loadCart(): Observable<Cart> {
+
+    return this.http.get<any>(
+      this.API_URL
+    ).pipe(
+
+      map(response => {
+        return this.normalizeCart(response.cartItems);
+      }),
+      tap(cart => {
+        this.cartSubject.next(cart);
+      })
+    );
+
   }
+  addToCart(
+    bookId: String,
+    quantity: number = 1
+  ): Observable<Cart> {
 
-  private loadCartFromStorage(): void {
-    const storedCart = localStorage.getItem('cart');
-    if (storedCart) {
-      const cart: Cart = JSON.parse(storedCart);
-      // Reload book data for each item
-      cart.items.forEach(item => {
-        this.bookService.getBook(item.bookId).subscribe(book => {
-          if (book) {
-            item.book = book;
-          }
-        });
-      });
-      this.cartSubject.next(cart);
-    }
-  }
-
-  private saveCartToStorage(cart: Cart): void {
-    localStorage.setItem('cart', JSON.stringify(cart));
-    this.cartSubject.next(cart);
-  }
-
-  addToCart(bookId: string, quantity: number = 1): Observable<Cart> {
-    const currentCart = this.cartSubject.value;
-    
-    this.bookService.getBook(bookId).subscribe(book => {
-      if (!book) return;
-
-      const existingItem = currentCart.items.find(item => item.bookId === bookId);
-      
-      if (existingItem) {
-        existingItem.quantity += quantity;
-        existingItem.priceAtAddTime = book.price;
-      } else {
-        currentCart.items.push({
-          bookId: bookId,
-          quantity: quantity,
-          priceAtAddTime: book.price,
-          book: book
-        });
+    return this.http.post<any>(
+      `${this.API_URL}/add`,
+      {
+        bookId,
+        quantity
       }
-      
-      this.updateCartTotal(currentCart);
-      this.saveCartToStorage(currentCart);
-    });
-    
-    return of(currentCart).pipe();
+    ).pipe(
+
+      map(response =>
+        this.normalizeCart(response.cart)
+      ),
+
+      tap(cart => {
+        this.cartSubject.next(cart);
+      })
+
+    );
+
   }
 
-  updateQuantity(bookId: string, quantity: number): Observable<Cart> {
-    const currentCart = this.cartSubject.value;
-    const item = currentCart.items.find(item => item.bookId === bookId);
-    
-    if (item && quantity > 0) {
-      item.quantity = quantity;
-      this.updateCartTotal(currentCart);
-      this.saveCartToStorage(currentCart);
-    } else if (quantity === 0) {
-      this.removeFromCart(bookId);
+   updateQuantity(
+    bookId: string,
+    quantity: number
+  ): Observable<Cart> {
+
+    if (quantity <= 0) {
+      return this.removeFromCart(bookId);
     }
-    
-    return of(currentCart);
+
+    return this.http.patch<any>(
+      `${this.API_URL}/update`,
+      {
+        bookId,
+        quantity
+      }
+    ).pipe(
+
+      map(response =>
+        this.normalizeCart(response.cart)
+      ),
+
+      tap(cart => {
+        this.cartSubject.next(cart);
+      })
+
+    );
+
   }
 
-  removeFromCart(bookId: string): Observable<Cart> {
-    const currentCart = this.cartSubject.value;
-    currentCart.items = currentCart.items.filter(item => item.bookId !== bookId);
-    this.updateCartTotal(currentCart);
-    this.saveCartToStorage(currentCart);
-    return of(currentCart);
-  }
 
+  removeFromCart(
+    bookId: string
+  ): Observable<Cart> {
+
+    return this.http.delete<any>(
+      `${this.API_URL}/remove`,
+      {
+        body: {
+          bookId
+        }
+      }
+    ).pipe(
+
+      map(response =>
+        this.normalizeCart(response.cart)
+      ),
+
+      tap(cart => {
+        this.cartSubject.next(cart);
+      })
+
+    );
+
+  }
   clearCart(): Observable<Cart> {
-    const currentCart = this.cartSubject.value;
-    currentCart.items = [];
-    currentCart.totalAmount = 0;
-    this.saveCartToStorage(currentCart);
-    return of(currentCart);
-  }
+  return this.http.delete<any>(
+    `${this.API_URL}/clear`
+  ).pipe(
+    map(response => this.normalizeCart(response.cart)),
+    tap(cart => {
+      this.cartSubject.next(cart);
+    })
+  );
+}
 
   private updateCartTotal(cart: Cart): void {
     cart.totalAmount = cart.items.reduce((total, item) => {
@@ -116,11 +137,53 @@ export class CartService {
     cart.updatedAt = new Date();
   }
 
-  getCartItemCount(): number {
-    return this.cartSubject.value.items.reduce((count, item) => count + item.quantity, 0);
+   getCartItemCount(): number {
+
+    return this.cartSubject.value.items
+      .reduce(
+        (count, item) =>
+          count + item.quantity,
+        0
+      );
+
   }
+
 
   getCartTotal(): number {
     return this.cartSubject.value.totalAmount;
+  }
+
+private normalizeCart(cart: any): Cart {
+
+    if (!cart) {
+      return this.initializeCart();
+    }
+
+    return {
+      ...cart,
+     items: (cart.items || []).map((item: any) => {
+
+      // Backend populates items.bookId with the complete Book object
+      const populatedBook =
+        item.bookId && typeof item.bookId === 'object'
+          ? item.bookId
+          : item.book;
+
+      // Keep bookId as a string for update/remove requests
+      const bookId =
+        typeof item.bookId === 'object'
+          ? item.bookId._id
+          : item.bookId;
+
+      return {
+        ...item,
+        bookId,
+        book: populatedBook
+      };
+
+    }),
+      totalAmount: cart.totalAmount || 0
+    };
+
   }
 }

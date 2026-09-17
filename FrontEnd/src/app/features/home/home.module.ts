@@ -7,7 +7,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { HeroComponent } from './components/hero/hero.component';
 import { CategoriesComponent } from './components/categories/categories.component';
 import { BestSellersComponent } from './components/best-sellers/best-sellers.component';
-import { FeaturedBooksComponent } from './components/featured-books/featured-books.component';
+import { FeaturedBooksComponent } from './components/newarrivals/newarrivals.component';
 
 @NgModule({
   declarations: [

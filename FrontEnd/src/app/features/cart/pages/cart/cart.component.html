@@ -1,8 +1,17 @@
 <div class="container mx-auto px-6 py-12">
       <h1 class="text-4xl font-bold mb-8">Shopping Cart</h1>
-      
+      <div *ngIf="loading" class="text-center py-20">
+       <div class="text-4xl mb-4 animate-pulse">🛒</div>
+          <h3 class="text-xl font-semibold">
+             Loading your cart...
+          </h3>
+
+          <p class="text-gray-500 mt-2">
+           Please wait a moment.
+          </p>
+        </div>
       <!-- Empty Cart -->
-      <div *ngIf="cart.items.length === 0" class="text-center py-20 bg-white dark:bg-gray-800 rounded-xl">
+      <div *ngIf="!loading && !error &&cart.items.length === 0" class="text-center py-20 bg-surface dark:bg-gray-800 rounded-xl">
         <div class="text-6xl mb-4">🛒</div>
         <h3 class="text-2xl font-bold mb-2">Your cart is empty</h3>
         <p class="text-gray-500 mb-6">Looks like you haven't added any books yet</p>
@@ -10,70 +19,39 @@
       </div>
       
       <!-- Cart with Items -->
-      <div *ngIf="cart.items.length > 0" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div *ngIf="!loading && !error && cart.items.length > 0" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Cart Items -->
         <div class="lg:col-span-2 space-y-4">
-          <div *ngFor="let item of cart.items" class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-            <div class="flex flex-col sm:flex-row gap-6">
-              <img [src]="item.book?.image?.[0]" [alt]="item.book?.title || 'Book cover'"
-                   class="w-32 h-40 object-cover rounded-lg">
-              
-              <div class="flex-1">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <h3 class="text-xl font-bold mb-2">{{ item.book?.title }}</h3>
-                    <p class="text-gray-600 dark:text-gray-400 mb-2">{{ item.book?.author }}</p>
-                    <p class="text-sm text-gray-500">ISBN: {{ item.book?.ISBN }}</p>
-                  </div>
-                  <button (click)="removeItem(item.bookId)" 
-                          class="text-red-500 hover:text-red-700 transition">
-                    ✕
-                  </button>
-                </div>
-                
-                <div class="flex justify-between items-center mt-4">
-                  <div class="flex items-center gap-3">
-                    <button (click)="updateQuantity(item.bookId, item.quantity - 1)" 
-                            class="w-8 h-8 rounded-full border hover:bg-gray-100">
-                      -
-                    </button>
-                    <span class="text-lg font-semibold w-12 text-center">{{ item.quantity }}</span>
-                    <button (click)="updateQuantity(item.bookId, item.quantity + 1)" 
-                            class="w-8 h-8 rounded-full border hover:bg-gray-100">
-                      +
-                    </button>
-                  </div>
-                  <div class="text-right">
-                    <p class="text-sm text-gray-500">Price</p>
-                    <p class="text-xl font-bold text-indigo-600">\${{ item.priceAtAddTime }}</p>
-                  </div>
-                  <div class="text-right">
-                    <p class="text-sm text-gray-500">Subtotal</p>
-                    <p class="text-xl font-bold">\${{ item.priceAtAddTime * item.quantity }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <app-book-card
+  *ngFor="let item of cart.items"
+  [book]="item.book!"
+  [cartMode]="true"
+  [cartQuantity]="item.quantity"
+  [cartPrice]="item.priceAtAddTime"
+  (cartQuantityChange)="updateQuantity(item.bookId, $event)"
+  (removeCartItem)="removeItem(item.bookId)"
+>
+</app-book-card>  
+          
         </div>
         
         <!-- Order Summary -->
         <div class="lg:col-span-1">
-          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 sticky top-24">
+          <div class="bg-background rounded-xl shadow-md p-6 sticky top-24">
             <h2 class="text-2xl font-bold mb-6">Order Summary</h2>
             
             <div class="space-y-3 pb-4 border-b">
               <div class="flex justify-between">
                 <span>Subtotal</span>
-                <span>\${{ cart.totalAmount }}</span>
+                <span>\₹{{ cart.totalAmount | number:'1.0-0'}}</span>
               </div>
               <div class="flex justify-between">
                 <span>Shipping</span>
-                <span>{{ cart.totalAmount > 50 ? 'Free' : '$5.00' }}</span>
+                <span>{{ cart.totalAmount >= 500 ? 'Free' : '₹50.00' }}</span>
               </div>
               <div class="flex justify-between text-lg font-bold pt-2">
                 <span>Total</span>
-                <span class="text-2xl text-indigo-600">\${{ getTotal() }}</span>
+                <span class="text-2xl text-secondary">\₹{{ getTotal() | number:'1.0-0' }}</span>
               </div>
             </div>
             

@@ -10,6 +10,7 @@ import { RegisterFormComponent } from './components/register-form/register-form.
 import { AuthBannerComponent } from './components/auth-banner/auth-banner.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -24,6 +25,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     SharedModule,
     AuthRoutingModule
   ]

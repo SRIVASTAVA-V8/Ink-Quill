@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { BooksRoutingModule } from './books-routing.module';
 import { BooksListComponent } from './pages/books-list/books-list.component';
 import { BookDetailsComponent } from './pages/book-details/book-details.component';
-import { SearchBooksComponent } from './components/search-books/search-books.component';
 import { BookFilterComponent } from './components/book-filter/book-filter.component';
 import { BookSortComponent } from './components/book-sort/book-sort.component';
 import { BooksGridComponent } from './components/books-grid/books-grid.component';
@@ -18,7 +17,6 @@ import { ReviewsComponent } from './components/reviews/reviews.component';
   declarations: [
     BooksListComponent,
     BookDetailsComponent,
-    SearchBooksComponent,
     BookFilterComponent,
     BookSortComponent,
     BooksGridComponent,

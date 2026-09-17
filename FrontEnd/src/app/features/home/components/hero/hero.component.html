@@ -1,22 +1,188 @@
-<section class="relative bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 text-white overflow-hidden">
-      <div class="absolute inset-0 bg-black opacity-50"></div>
-      <div class="relative container mx-auto px-6 py-32 text-center">
-        <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
-          Discover Your Next
-          <span class="bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">
-            Great Read
-          </span>
-        </h1>
-        <p class="text-xl md:text-2xl mb-12 opacity-90 max-w-2xl mx-auto">
-          Explore thousands of books curated just for you. From bestsellers to hidden gems.
-        </p>
-        <div class="flex gap-4 justify-center flex-wrap">
-          <button routerLink="/books" class="btn-primary text-lg px-8 py-4">
-            Explore Now
-          </button>
-          <button routerLink="/books" class="px-8 py-4 bg-white/20 backdrop-blur-sm rounded-lg font-semibold hover:bg-white/30 transition-all">
-            Browse Categories
-          </button>
-        </div>
+<section
+  class="relative overflow-hidden bg-background text-primary"
+>
+  <!-- Decorative background elements -->
+  <div
+    class="absolute -top-32 -right-32 w-96 h-96
+           rounded-full bg-secondary/20 blur-3xl"
+  ></div>
+
+  <div
+    class="absolute -bottom-40 -left-32 w-96 h-96
+           rounded-full bg-accent/30 blur-3xl"
+  ></div>
+
+  <!-- Subtle decorative circle -->
+  <div
+    class="absolute top-20 right-[15%]
+           w-3 h-3 rounded-full bg-secondary"
+  ></div>
+
+  <div
+    class="absolute bottom-24 left-[18%]
+           w-2 h-2 rounded-full bg-accent"
+  ></div>
+
+  <!-- Content -->
+  <div
+    class="
+      relative
+      container mx-auto
+      px-6
+      py-24 md:py-32
+      text-center
+    "
+  >
+
+    <!-- Small eyebrow -->
+    <div
+      class="
+        inline-flex items-center gap-2
+        px-4 py-2
+        mb-7
+        rounded-full
+        bg-secondary/10
+        border border-secondary/20
+        text-primary
+        text-sm
+        font-semibold
+        tracking-wide
+      "
+    >
+      <span class="w-2 h-2 rounded-full bg-secondary"></span>
+      Your next story awaits
+    </div>
+
+    <!-- Main Heading -->
+    <h1
+      class="
+        text-5xl md:text-6xl lg:text-7xl
+        font-bold
+        tracking-tight
+        leading-tight
+        mb-6
+        text-primary
+        animate-fade-in
+      "
+    >
+      Discover Your Next
+      <span class="text-secondary">
+        Great Read
+      </span>
+    </h1>
+
+    <!-- Description -->
+    <p
+      class="
+        text-lg md:text-xl
+        text-body
+        max-w-2xl
+        mx-auto
+        mb-10
+        leading-relaxed
+      "
+    >
+      Explore thousands of books curated just for you —
+      from timeless bestsellers to hidden gems waiting
+      to be discovered.
+    </p>
+
+    <!-- Buttons -->
+    <div
+      class="
+        flex
+        gap-4
+        justify-center
+        flex-wrap
+      "
+    >
+
+      <!-- Primary CTA -->
+      <button
+        routerLink="/books"
+        class="
+          px-8 py-4
+          bg-primary
+          text-white
+          rounded-xl
+          font-semibold
+          text-lg
+
+          shadow-lg
+          shadow-primary/20
+
+          hover:bg-secondary
+          hover:-translate-y-1
+          hover:shadow-xl
+
+          transition-all
+          duration-300
+        "
+      >
+        Explore Now
+        <span class="ml-2">→</span>
+      </button>
+
+      <!-- Secondary CTA -->
+      <a
+       href="#categories"
+        class="
+          px-8 py-4
+          bg-surface
+          text-primary
+          border-2
+          border-border
+          rounded-xl
+          font-semibold
+          text-lg
+
+          hover:border-secondary
+          hover:text-secondary
+          hover:-translate-y-1
+
+          transition-all
+          duration-300
+        "
+      >
+        Browse Categories
+    </a>
+
+    </div>
+
+    <!-- Trust / stats -->
+    <div
+      class="
+        mt-14
+        flex
+        justify-center
+        items-center
+        gap-8
+        flex-wrap
+        text-sm
+        text-body
+      "
+    >
+
+      <div class="flex items-center gap-2">
+        <span class="text-secondary text-lg">✓</span>
+        Curated Collection
       </div>
-    </section>
+
+      <div class="hidden sm:block w-px h-5 bg-border"></div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-secondary text-lg">✓</span>
+        Thousands of Titles
+      </div>
+
+      <div class="hidden sm:block w-px h-5 bg-border"></div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-secondary text-lg">✓</span>
+        Something for Everyone
+      </div>
+
+    </div>
+
+  </div>
+</section>

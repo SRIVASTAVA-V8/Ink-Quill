@@ -23,24 +23,34 @@ dblayer.getBooks = async (filter, sort, page, limit, skip) => {
     .sort(sort || { createdAt: -1 })
     .skip(skip)
     .limit(limit)
-    .select(' _id title author price category language image ratingAvg ratingCount');
+    .select(' _id title author description discount tags price category language image ratingAvg ratingCount');
 }
 
 dblayer.getBookById = async (id) => {
     return await Book.findById(id);
 }  
+dblayer.getCartRaw = async (query, options = {}) => {
+
+    const { session } = options;
+
+    return await Cart.findOne(query)
+        .session(session);
+};
 dblayer.getOrCreateCart = async (userId, sessionId) => {
-    const cart = await Cart.findOne({ $or: [{userId: userId }, { sessionId: sessionId }] }).populate('items.bookId', 'title priceAtAddTime image quantity totalAmount');
+    const query = userId
+        ? { userId }
+        : { sessionId };
+    const cart = await Cart.findOne(query).populate('items.bookId', 'title author price discount image stock category ratingAvg ratingCount');
     if (cart) {
         return cart;
     }   
-    const newCart = new Cart({ userId, sessionId, items: [], totalAmount: 0 });
+    const newCart = new Cart({ userId: userId || null , sessionId: sessionId || null, items: [], totalAmount: 0 });
     return await newCart.save();
 };
 dblayer.getCart = async (query,options={}) => {
     const{session}=options;
-    const cart=  await Cart.findOne(query).populate('items.bookId', 'title priceAtAddTime image quantity totalAmount').session(session);
-   // console.log(`cart based on :${query} is : ${cart}`);
+    const cart=  await Cart.findOne(query).populate('items.bookId', 'title author price discount image stock category ratingAvg ratingCount').session(session);
+   console.log(`cart in db  : ${cart}`);
     return cart;
 };
 
@@ -56,20 +66,22 @@ dblayer.clearCart = async (cartId, options={}) => {
 
 // Wishlist functions
 dblayer.getOrCreateWishlist = async (userId, sessionId) => {
-    const wishlist = await Wishlist.findOne({ $or: [{userId: userId }, { sessionId: sessionId }] }).populate('items.bookId', 'title author price image');
+    const query = userId? { userId } : { sessionId };
+    const wishlist = await Wishlist.findOne(query).populate('items.bookId', 'title author price image');
     if (wishlist) {
         return wishlist;
     }   
-    const newWishlist = new Wishlist({ userId, sessionId, items: [] });
+    const newWishlist = new Wishlist({ userId: userId || null, sessionId: sessionId || null, items: [] });
     return await newWishlist.save();
 };
 
-dblayer.getWishlist = async (query, page, limit) => {
-    const skip = (page - 1) * limit;
-    const wishlist = await Wishlist.findOne(query).skip(skip).limit(limit).populate('items.bookId', '_id title author price image');
+dblayer.getWishlist = async (query) => {
+    const wishlist = await Wishlist.findOne(query).populate('items.bookId', '_id title author price image');
     return wishlist;
 };
-
+dblayer.getWishlistRaw = async (query) => {
+  return await Wishlist.findOne(query);
+};
 dblayer.updateWishlist = async (wishlist) => {
     return await wishlist.save();
 };

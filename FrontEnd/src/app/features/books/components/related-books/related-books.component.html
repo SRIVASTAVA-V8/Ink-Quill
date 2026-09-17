@@ -1,53 +1,146 @@
- <div *ngIf="relatedBooks" class="mt-16">
-      <!-- Same Author -->
-      <div *ngIf="relatedBooks.bySameAuthor.length > 0" class="mb-12">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h2 class="text-2xl font-bold">More by {{ author }}</h2>
-            <p class="text-gray-600 dark:text-gray-400">Other books from this author</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <app-book-card *ngFor="let book of relatedBooks.bySameAuthor" 
-                         [book]="book" 
-                         [compact]="true">
-          </app-book-card>
-        </div>
-      </div>
+<div
+  *ngIf="relatedBooks && !loadingRelated"
+  class="mt-16"
+>
 
-      <!-- Bestsellers in Category -->
-      <div *ngIf="relatedBooks.bestsellersInCategory.length > 0" class="mb-12">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h2 class="text-2xl font-bold flex items-center gap-2">
-              <span>🏆</span> Bestsellers in {{ category }}
-            </h2>
-            <p class="text-gray-600 dark:text-gray-400">Top-rated books in this genre</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <app-book-card *ngFor="let book of relatedBooks.bestsellersInCategory" 
-                         [book]="book" 
-                         [compact]="true">
-          </app-book-card>
-        </div>
-      </div>
+  <!-- =========================================
+       MORE BY SAME AUTHOR
+       ========================================= -->
 
-      <!-- Recommended -->
-      <div *ngIf="relatedBooks.recommendedForYou.length > 0" class="mb-12">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h2 class="text-2xl font-bold flex items-center gap-2">
-              <span>🎯</span> Recommended For You
-            </h2>
-            <p class="text-gray-600 dark:text-gray-400">Personalized recommendations</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <app-book-card *ngFor="let book of relatedBooks.recommendedForYou" 
-                         [book]="book" 
-                         [compact]="true">
-          </app-book-card>
-        </div>
-      </div>
+  <section
+    *ngIf="relatedBooks.bySameAuthor.length > 0"
+    class="mb-12"
+  >
+
+    <div class="mb-6">
+
+      <h2 class="text-2xl font-bold">
+        More by {{ book.author }}
+      </h2>
+
+      <p class="text-body dark:text-gray-400">
+        Other books from this author
+      </p>
+
     </div>
+
+
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+    >
+
+      <app-book-card
+        *ngFor="
+          let relatedBook
+          of relatedBooks.bySameAuthor
+        "
+        [book]="relatedBook"
+        [compact]="true"
+      >
+      </app-book-card>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================
+       MORE IN SAME CATEGORY
+       ========================================= -->
+
+  <section
+    *ngIf="relatedBooks.bySameCategory.length > 0"
+    class="mb-12"
+  >
+
+    <div class="mb-6">
+
+      <h2 class="text-2xl font-bold">
+        More in {{ book.category }}
+      </h2>
+
+      <p class="text-body dark:text-gray-400">
+        Explore more books from this genre
+      </p>
+
+    </div>
+
+
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+    >
+
+      <app-book-card
+        *ngFor="
+          let relatedBook
+          of relatedBooks.bySameCategory
+        "
+        [book]="relatedBook"
+        [compact]="true"
+      >
+      </app-book-card>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================
+       POPULAR PICKS
+       ========================================= -->
+
+  <section
+    *ngIf="relatedBooks.popularPicks.length > 0"
+    class="mb-12"
+  >
+
+    <div class="mb-6">
+
+      <h2 class="text-2xl font-bold flex items-center gap-2">
+        <span>🏆</span>
+        Popular Picks
+      </h2>
+
+      <p class="text-body dark:text-gray-400">
+        Bestsellers from this author and genre
+      </p>
+
+    </div>
+
+
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+    >
+
+      <app-book-card
+        *ngFor="
+          let relatedBook
+          of relatedBooks.popularPicks
+        "
+        [book]="relatedBook"
+        [compact]="true"
+      >
+      </app-book-card>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<!-- =========================================
+     LOADING STATE
+     ========================================= -->
+
+<div
+  *ngIf="loadingRelated"
+  class="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+>
+
+  <div
+    *ngFor="let item of [1,2,3,4]"
+    class="h-80 rounded-xl animate-pulse bg-gray-100 dark:bg-gray-800"
+  ></div>
+
+</div>

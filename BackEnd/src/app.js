@@ -14,7 +14,10 @@ const cookieParser=require('cookie-parser');
 const app=express();
 
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:4200',
+  credentials: true
+}));
 app.use(bodyParser.json());
 app.use(cookieParser());
 dotenv.config();

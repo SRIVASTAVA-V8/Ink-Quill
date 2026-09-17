@@ -1,175 +1,525 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
-import { Book,RelatedBooks } from '../models/book.model';
-import { DUMMY_BOOKS } from '../services/dummy-data';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable,forkJoin} from 'rxjs';
+import { map } from 'rxjs/operators';
+
+import {
+  Book,
+  RelatedBooks
+} from '../models/book.model';
+
+
+export interface BookQueryParams {
+
+  collection?: string;
+
+  category?: string;
+
+  search?: string;
+
+  language?: string;
+
+  author?: string;
+
+  min_price?: number;
+
+  max_price?: number;
+
+  sortby?: string;
+
+  exclude?: string;
+
+  page?: number;
+
+  limit?: number;
+
+}
+
+
+export interface BooksResponse {
+
+  warningMessage?: string | null;
+
+  books: Book[];
+
+}
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookService {
-  private books: Book[] = [...DUMMY_BOOKS];
 
-  getBooks(): Observable<Book[]> {
-    return of(this.books).pipe(delay(500));
-  }
+  private readonly API_URL =
+    'http://localhost:3000/api/collection';
 
-  getBook(id: string): Observable<Book | undefined> {
-    const book = this.books.find(b => b._id === id);
-    return of(book).pipe(delay(300));
-  }
 
-  // Get related books based on author, category, and bestsellers
-  getRelatedBooks(bookId: string): Observable<RelatedBooks> {
-    return new Observable<RelatedBooks>(observer => {
-      this.getBook(bookId).subscribe(currentBook => {
-        if (!currentBook) {
-          observer.next({
-            bySameAuthor: [],
-            bySameCategory: [],
-            bestsellersInCategory: [],
-            recommendedForYou: []
-          });
-          observer.complete();
-          return;
-        }
+  constructor(
+    private http: HttpClient
+  ) {}
 
-        // Books by same author (excluding current book)
-        const bySameAuthor = this.books
-          .filter(book => 
-            book._id !== currentBook._id && 
-            book.author === currentBook.author
-          )
-          .slice(0, 4);
 
-        // Books by same category (excluding current book)
-        const bySameCategory = this.books
-          .filter(book => 
-            book._id !== currentBook._id && 
-            book.category === currentBook.category
-          )
-          .slice(0, 4);
+  // ==========================================
+  // GET BOOKS
+  // ==========================================
 
-        // Bestsellers in same category (by rating, excluding current book)
-        const bestsellersInCategory = this.books
-          .filter(book => 
-            book._id !== currentBook._id && 
-            book.category === currentBook.category
-          )
-          .sort((a, b) => b.ratingAvg - a.ratingAvg)
-          .slice(0, 4);
+  getBooks(
+    options: BookQueryParams = {}
+  ): Observable<BooksResponse> {
 
-        // Recommended for you (mix of author and category books)
-        const recommendedForYou = this.getRecommendedBooks(currentBook);
+    const collection =
+      options.collection || 'all';
 
-        observer.next({
-          bySameAuthor,
-          bySameCategory,
-          bestsellersInCategory,
-          recommendedForYou
-        });
-        observer.complete();
-      });
-    }).pipe(delay(300));
-  }
+    let params = new HttpParams();
 
-  // Get recommended books based on user's current book
-  private getRecommendedBooks(currentBook: Book): Book[] {
-    const recommended: Book[] = [];
-    const usedBookIds = new Set<string>([currentBook._id]);
 
-    // First try to get books by same author
-    const authorBooks = this.books
-      .filter(book => 
-        book._id !== currentBook._id && 
-        book.author === currentBook.author
-      )
-      .sort((a, b) => b.ratingAvg - a.ratingAvg);
+    if (options.category) {
 
-    authorBooks.forEach(book => {
-      if (!usedBookIds.has(book._id) && recommended.length < 4) {
-        recommended.push(book);
-        usedBookIds.add(book._id);
-      }
-    });
+      params = params.set(
+        'category',
+        options.category
+      );
 
-    // Then try to get books from same category
-    const categoryBooks = this.books
-      .filter(book => 
-        book._id !== currentBook._id && 
-        book.category === currentBook.category
-      )
-      .sort((a, b) => b.ratingAvg - a.ratingAvg);
-
-    categoryBooks.forEach(book => {
-      if (!usedBookIds.has(book._id) && recommended.length < 4) {
-        recommended.push(book);
-        usedBookIds.add(book._id);
-      }
-    });
-
-    // Finally, get highest rated books from other categories
-    if (recommended.length < 4) {
-      const otherBooks = this.books
-        .filter(book => 
-          book._id !== currentBook._id && 
-          !usedBookIds.has(book._id)
-        )
-        .sort((a, b) => b.ratingAvg - a.ratingAvg);
-
-      otherBooks.forEach(book => {
-        if (recommended.length < 4) {
-          recommended.push(book);
-          usedBookIds.add(book._id);
-        }
-      });
     }
 
-    return recommended;
-  }
 
-  // Get bestsellers by author
-  getBestsellersByAuthor(author: string): Observable<Book[]> {
-    const books = this.books
-      .filter(book => book.author === author)
-      .sort((a, b) => b.ratingAvg - a.ratingAvg)
-      .slice(0, 4);
-    return of(books).pipe(delay(300));
-  }
+    if (options.search) {
 
-  // Get bestsellers by category
-  getBestsellersByCategory(category: string): Observable<Book[]> {
-    const books = this.books
-      .filter(book => book.category === category)
-      .sort((a, b) => b.ratingAvg - a.ratingAvg)
-      .slice(0, 4);
-    return of(books).pipe(delay(300));
-  }
+      params = params.set(
+        'search',
+        options.search
+      );
 
-  searchBooks(query: string): Observable<Book[]> {
-    const filtered = this.books.filter(book =>
-      book.title.toLowerCase().includes(query.toLowerCase()) ||
-      book.author.toLowerCase().includes(query.toLowerCase()) ||
-      book.ISBN.includes(query)
+    }
+
+
+    if (options.language) {
+
+      params = params.set(
+        'language',
+        options.language
+      );
+
+    }
+
+
+    if (options.author) {
+
+      params = params.set(
+        'author',
+        options.author
+      );
+
+    }
+
+
+    if (
+      options.min_price !== null &&
+      options.min_price !== undefined
+    ) {
+
+      params = params.set(
+        'min_price',
+        options.min_price.toString()
+      );
+
+    }
+
+
+    if (
+      options.max_price !== null &&
+      options.max_price !== undefined
+    ) {
+
+      params = params.set(
+        'max_price',
+        options.max_price.toString()
+      );
+
+    }
+
+
+    if (options.sortby) {
+
+      params = params.set(
+        'sortby',
+        options.sortby
+      );
+
+    }
+
+
+    if (options.exclude) {
+
+      params = params.set(
+        'exclude',
+        options.exclude
+      );
+
+    }
+
+
+    if (options.page) {
+
+      params = params.set(
+        'page',
+        options.page.toString()
+      );
+
+    }
+
+
+    if (options.limit) {
+
+      params = params.set(
+        'limit',
+        options.limit.toString()
+      );
+
+    }
+
+
+    return this.http.get<BooksResponse>(
+      `${this.API_URL}/${collection}`,
+      {
+        params
+      }
     );
-    return of(filtered).pipe(delay(300));
+
   }
 
-  getBooksByCategory(category: string): Observable<Book[]> {
-    const filtered = this.books.filter(book => book.category === category);
-    return of(filtered).pipe(delay(300));
+
+  // ==========================================
+  // GET SINGLE BOOK
+  // ==========================================
+
+  getBook(id: string): Observable<Book> {
+
+  return this.http.get<{ book: Book }>(
+    `${this.API_URL}/item/${id}`
+  ).pipe(
+    map(response => response.book)
+  );
+
+}
+
+
+  // ==========================================
+  // RELATED BOOKS
+  // ==========================================
+
+  getRelatedBooks(
+    book: Book
+  ): Observable<RelatedBooks> {
+
+    return forkJoin({
+
+      // --------------------------------------
+      // More by same author
+      // --------------------------------------
+
+      bySameAuthor:
+        this.getBooksByAuthor(
+          book.author,
+          book._id,
+          4
+        ),
+
+
+      // --------------------------------------
+      // More in same category
+      // --------------------------------------
+
+      bySameCategory:
+        this.getBooksByCategory(
+          book.category,
+          book._id,
+          4
+        ),
+
+
+      // --------------------------------------
+      // Bestseller candidates by author
+      // --------------------------------------
+
+      bestsellersByAuthor:
+        this.getBestsellersByAuthor(
+          book.author,
+          book._id,
+          4
+        ),
+
+
+      // --------------------------------------
+      // Bestseller candidates by category
+      // --------------------------------------
+
+      bestsellersInCategory:
+        this.getBestsellersByCategory(
+          book.category,
+          book._id,
+          4
+        )
+
+    }).pipe(
+
+      map(result => {
+
+        // ------------------------------------
+        // Merge bestseller candidates
+        // ------------------------------------
+
+        const bestsellerCandidates = [
+          ...result.bestsellersByAuthor.books,
+          ...result.bestsellersInCategory.books
+        ];
+
+
+        // ------------------------------------
+        // Remove duplicate books
+        // ------------------------------------
+
+        const uniquePopularPicks =
+          bestsellerCandidates.filter(
+            (book, index, books) =>
+              index ===
+              books.findIndex(
+                item => item._id === book._id
+              )
+          );
+
+
+        // ------------------------------------
+        // Make sure current book is excluded
+        // ------------------------------------
+
+        const popularPicks =
+          uniquePopularPicks
+            .filter(
+              relatedBook =>
+                relatedBook._id !== book._id
+            )
+            .slice(0, 4);
+
+
+        return {
+
+          bySameAuthor:
+            result.bySameAuthor.books,
+
+          bySameCategory:
+            result.bySameCategory.books,
+
+          popularPicks
+
+        };
+
+      })
+
+    );
+
+  }
+  // ==========================================
+  // SAME AUTHOR
+  // ==========================================
+
+  getBooksByAuthor(
+    author: string,
+    exclude?: string,
+    limit: number = 4
+  ): Observable<BooksResponse> {
+
+    return this.getBooks({
+
+      collection: 'all',
+
+      author,
+
+      exclude,
+
+      page: 1,
+
+      limit
+
+    });
+
   }
 
-  getBestsellers(): Observable<Book[]> {
-    const bestsellers = [...this.books]
-      .sort((a, b) => b.ratingAvg - a.ratingAvg)
-      .slice(0, 4);
-    return of(bestsellers).pipe(delay(300));
+
+  // ==========================================
+  // SAME CATEGORY
+  // ==========================================
+
+  getBooksByCategory(
+    category: string,
+    exclude?: string,
+    limit: number = 4
+  ): Observable<BooksResponse> {
+
+    return this.getBooks({
+
+      collection: 'all',
+
+      category,
+
+      exclude,
+
+      page: 1,
+
+      limit
+
+    });
+
   }
 
-  getNewReleases(): Observable<Book[]> {
-    const newReleases = [...this.books]
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .slice(0, 4);
-    return of(newReleases).pipe(delay(300));
+
+  // ==========================================
+  // BESTSELLERS BY AUTHOR
+  // ==========================================
+
+  getBestsellersByAuthor(
+    author: string,
+    exclude?: string,
+    limit: number = 4
+  ): Observable<BooksResponse> {
+
+    return this.getBooks({
+
+      collection: 'all',
+
+      author,
+
+      sortby: 'bestseller',
+
+      exclude,
+
+      page: 1,
+
+      limit
+
+    });
+
   }
+
+
+  // ==========================================
+  // BESTSELLERS BY CATEGORY
+  // ==========================================
+
+  getBestsellersByCategory(
+    category: string,
+    exclude?: string,
+    limit: number = 4
+  ): Observable<BooksResponse> {
+
+    return this.getBooks({
+
+      collection: 'all',
+
+      category,
+
+      sortby: 'bestseller',
+
+      exclude,
+
+      page: 1,
+
+      limit
+
+    });
+
+  }
+
+
+  // ==========================================
+  // BESTSELLERS
+  // ==========================================
+
+  getBestsellers(
+    limit: number = 4
+  ): Observable<BooksResponse> {
+
+    return this.getBooks({
+
+      collection: 'bestsellers',
+
+      page: 1,
+
+      limit
+
+    });
+
+  }
+
+
+  // ==========================================
+  // NEW RELEASES
+  // ==========================================
+
+  getNewReleases(
+    limit: number = 4
+  ): Observable<BooksResponse> {
+
+    return this.getBooks({
+
+      collection: 'newarrivals',
+
+      page: 1,
+
+      limit
+
+    });
+
+  }
+
+
+  // ==========================================
+  // SEARCH
+  // ==========================================
+
+  searchBooks(
+    query: string,
+    page: number = 1,
+    limit: number = 10
+  ): Observable<BooksResponse> {
+
+    return this.getBooks({
+
+      collection: 'all',
+
+      search: query,
+
+      page,
+
+      limit
+
+    });
+
+  }
+
+
+  // ==========================================
+  // CATEGORY
+  // ==========================================
+
+  getBooksByCategoryOnly(
+    category: string,
+    page: number = 1,
+    limit: number = 10
+  ): Observable<BooksResponse> {
+
+    return this.getBooks({
+
+      collection: 'all',
+
+      category,
+
+      page,
+
+      limit
+
+    });
+
+  }
+
 }

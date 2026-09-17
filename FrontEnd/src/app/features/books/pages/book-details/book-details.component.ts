@@ -15,10 +15,8 @@ export class BookDetailsComponent implements OnInit {
 book: Book | null = null;
   quantity = 1;
   isInWishlist = false;
-  relatedBooks: RelatedBooks | null = null;
-  authorBestsellers: Book[] = [];
-  loadingRelated = true;
-
+  loadingBook = true;
+  
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -28,44 +26,58 @@ book: Book | null = null;
   ) {}
 
   ngOnInit() {
-    const bookId = this.route.snapshot.params['id'];
-    this.bookService.getBook(bookId).subscribe(book => {
-      this.book = book || null;
-      this.checkWishlistStatus();
-    });
+    this.route.paramMap.subscribe(params => {
+    const bookId = params.get('id');
+
+    if (bookId) {
+      this.loadBookDetails(bookId);
+    }
+  });
   }
 
-  loadBookDetails(bookId: string) {
-    this.loadingRelated = true;
-    
-    this.bookService.getBook(bookId).subscribe(book => {
-      this.book = book || null;
-      
-      if (this.book) {
+  loadBookDetails(bookId: string): void {
+
+    this.loadingBook = true;
+
+    this.book = null;
+
+    this.bookService.getBook(bookId).subscribe({
+
+      next: (book) => {
+
+        this.book = book;
+
+        this.loadingBook = false;
+
         this.checkWishlistStatus();
-        this.loadRelatedBooks(bookId);
-        this.loadAuthorBestsellers(this.book.author);
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Failed to load book:',
+          error
+        );
+
+        this.loadingBook = false;
+
+        this.router.navigate(['/books']);
+
       }
+
     });
+
   }
 
-  loadRelatedBooks(bookId: string) {
-    this.bookService.getRelatedBooks(bookId).subscribe(related => {
-      this.relatedBooks = related;
-      this.loadingRelated = false;
-    });
-  }
 
-  loadAuthorBestsellers(author: string) {
-    this.bookService.getBestsellersByAuthor(author).subscribe(books => {
-      // Exclude current book if it's in the list
-      this.authorBestsellers = books.filter(b => b._id !== this.book?._id);
-    });
-  }
 
   checkWishlistStatus() {
     if (this.book) {
       this.isInWishlist = this.wishlistService.isInWishlist(this.book._id);
+    }
+    else {
+      return;
     }
   }
 
@@ -85,6 +97,8 @@ book: Book | null = null;
     if (this.book) {
       this.cartService.addToCart(this.book._id, this.quantity).subscribe();
     }
+    else{return;}
+
   }
 
   toggleWishlist() {
@@ -99,14 +113,42 @@ book: Book | null = null;
         });
       }
     }
+    else
+    {
+      return;
+    }
   }
 
-  getDiscountedPrice(): number {
-    if (!this.book) return 0;
-    return this.book.discount > 0 ? 
-      this.book.price - (this.book.price * this.book.discount / 100) : 
-      this.book.price;
+   getDiscountedPrice(): number {
+
+    if (!this.book) {
+      return 0;
+    }
+
+    if (this.book.discount <= 0) {
+      return Math.round(this.book.price);
+    }
+
+    const discounted =
+      this.book.price -
+      (
+        this.book.price *
+        this.book.discount /
+        100
+      );
+
+    return Math.round(discounted);
+
   }
+
+  getBookPrice(book: Book | null | undefined): number {
+    if (!book) return 0;
+    const base = typeof book.price === 'number' ? book.price : 0;
+    const discount = typeof book.discount === 'number' ? book.discount : 0;
+    const price = discount > 0 ? base - (base * discount / 100) : base;
+    return Math.round(price * 100) / 100;
+  }
+
 
   goBack() {
     this.router.navigate(['/books']);

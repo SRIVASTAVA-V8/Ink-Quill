@@ -6,7 +6,7 @@ import { Wishlist, WishlistItem } from '../models/wishlist.model';
 
 export const DUMMY_BOOKS: Book[] = [
   {
-    _id: '1',
+    _id: '6a906d68907cf1aef70c41e9',
     title: 'The Midnight Library',
     author: 'Matt Haig',
     description: 'Between life and death there is a library. When Nora Seed finds herself in the Midnight Library, she has a chance to make things right. Up until now, her life has been full of misery and regret. She feels she has let everyone down, including herself. But things are about to change.',

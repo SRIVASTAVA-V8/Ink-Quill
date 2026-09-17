@@ -1,41 +1,181 @@
-<div class="container mx-auto px-6 py-8">
-      <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Filters Sidebar -->
-        <div class="lg:w-80">
-          <app-filters (filtersChanged)="applyFilters($event)"></app-filters>
-        </div>
-        
-        <!-- Books Grid -->
-        <div class="flex-1">
-          <!-- Sort & Search -->
-          <div class="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-            <app-sort (sortChanged)="applySort($event)"></app-sort>
-            <div class="relative">
-              <input type="text" 
-                     [(ngModel)]="searchTerm"
-                     (input)="searchBooks()"
-                     placeholder="Search books..." 
-                     class="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
-          </div>
-          
-          <!-- Loading State -->
-          <div *ngIf="loading" class="text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          </div>
-          
-          <!-- Books Grid using Book Card Component -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <app-book-card *ngFor="let book of displayedBooks" 
-                           [book]="book"
-                           (bookAction)="handleBookAction($event)">
-            </app-book-card>
-          </div>
-          
-          <!-- Empty State -->
-          <div *ngIf="!loading && displayedBooks.length === 0" class="text-center py-12">
-            <p class="text-gray-500 text-lg">No books found. Try adjusting your filters.</p>
-          </div>
-        </div>
+<div class="min-h-screen,min-w-full mx-auto px-6 py-8 bg-background">
+
+  <div class="flex flex-col lg:flex-row gap-8">
+
+
+    <!-- ================================================= -->
+    <!-- FILTER SIDEBAR -->
+    <!-- ================================================= -->
+
+    <aside class="lg:w-80 flex-shrink-0">
+
+      <app-book-filter
+        (filtersChanged)="applyFilters($event)"
+      >
+      </app-book-filter>
+
+    </aside>
+
+
+    <!-- ================================================= -->
+    <!-- BOOKS AREA -->
+    <!-- ================================================= -->
+
+    <main class="flex-1">
+
+
+      <!-- ================================================= -->
+      <!-- TOP BAR -->
+      <!-- ================================================= -->
+
+      <div
+        class="
+          flex
+          justify-between
+          items-center
+          mb-6
+        "
+      >
+
+        <!-- Results Count -->
+
+        <p class="text-sm text-body">
+
+          <span
+            class="font-semibold text-heading"
+          >
+            {{ displayedBooks.length }}
+          </span>
+
+          books found
+
+        </p>
+
+
+        <!-- Sort -->
+
+        <app-book-sort
+          (sortChanged)="applySort($event)"
+        >
+        </app-book-sort>
+
       </div>
-    </div>
+
+
+      <!-- ================================================= -->
+      <!-- LOADING -->
+      <!-- ================================================= -->
+
+      <div
+        *ngIf="loading"
+        class="
+          text-center
+          py-20
+        "
+      >
+
+        <div
+          class="
+            inline-block
+            animate-spin
+            rounded-full
+            h-12
+            w-12
+            border-b-2
+            border-primary
+          "
+        >
+        </div>
+
+
+        <p
+          class="
+            mt-4
+            text-body
+          "
+        >
+          Loading books...
+        </p>
+
+      </div>
+
+
+      <!-- ================================================= -->
+      <!-- BOOK GRID -->
+      <!-- ================================================= -->
+
+      <div
+        *ngIf="
+          !loading &&
+          displayedBooks.length > 0
+        "
+        class="
+          grid
+          grid-cols-1
+          md:grid-cols-2
+          lg:grid-cols-3
+          gap-6
+        "
+      >
+
+        <app-book-card
+          *ngFor="let book of displayedBooks"
+          [book]="book"
+          (bookAction)="handleBookAction($event)"
+        >
+        </app-book-card>
+
+      </div>
+
+
+      <!-- ================================================= -->
+      <!-- EMPTY STATE -->
+      <!-- ================================================= -->
+
+      <div
+        *ngIf="
+          !loading &&
+          displayedBooks.length === 0
+        "
+        class="
+          text-center
+          py-20
+          bg-surface
+          border
+          border-border
+          rounded-2xl
+        "
+      >
+
+        <div class="text-5xl mb-5">
+          📚
+        </div>
+
+
+        <h3
+          class="
+            text-xl
+            font-bold
+            text-heading
+            mb-2
+          "
+        >
+          No books found
+        </h3>
+
+
+        <p class="text-body">
+
+          Try adjusting your filters
+          or searching for another book.
+
+        </p>
+
+      </div>
+
+
+    </main>
+
+  </div>
+
+</div>

@@ -1,78 +1,136 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+
 import { User, LoginData, RegisterData } from '../models/user.model';
-import { DUMMY_USERS } from '../services/dummy-data';
+import { CartService } from './cart.service';
+import { WishlistService } from './wishlist.service';
+
+interface LoginResponse {
+  user: {
+    userId: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+  token: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor() {
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      this.currentUserSubject.next(JSON.parse(storedUser));
+  private readonly API_URL = 'http://localhost:3000/api/user';
+
+  private currentUserSubject =
+    new BehaviorSubject<User | null>(
+      this.getStoredUser()
+    );
+
+  public currentUser$ =
+    this.currentUserSubject.asObservable();
+
+
+  constructor(
+    private http: HttpClient,
+    private cartService: CartService,
+    private wishlistService: WishlistService
+  ) {}
+
+
+  private getStoredUser(): User | null {
+
+    const storedUser =
+      localStorage.getItem('currentUser');
+
+    if (!storedUser) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(storedUser);
+    } catch {
+      localStorage.removeItem('currentUser');
+      return null;
     }
   }
+ 
+  private handleAuthResponse(response: LoginResponse): User {
+  const user: User = {
+    _id: response.user.userId,
+    name: response.user.name,
+    email: response.user.email,
+    role: response.user.role as any
+  } as User;
+
+  localStorage.setItem('currentUser', JSON.stringify(user));
+  localStorage.setItem('token', response.token);
+
+  this.currentUserSubject.next(user);
+
+  this.cartService.loadCart().subscribe({
+    error: error => {
+      console.error('Failed to load cart:', error);
+    }
+  });
+
+  this.wishlistService.loadWishlist().subscribe({
+    error: error => {
+      console.error('Failed to load wishlist:', error);
+    }
+  });
+
+  return user;
+}
 
   login(loginData: LoginData): Observable<User> {
-    const user = DUMMY_USERS.find(u => u.email === loginData.email);
-    
-    if (user && user.password === loginData.password) {
-      const { password, ...userWithoutPassword } = user;
-      localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
-      localStorage.setItem('token', 'dummy-jwt-token');
-      this.currentUserSubject.next(userWithoutPassword as User);
-      return of(userWithoutPassword as User).pipe(delay(500));
-    }
-    
-    throw new Error('Invalid email or password');
+
+    return this.http.post<LoginResponse>(
+      `${this.API_URL}/login`,
+      loginData
+    ).pipe(
+    map(response => this.handleAuthResponse(response)),
+    catchError(error => throwError(() => error))
+  );
   }
+
 
   register(registerData: RegisterData): Observable<User> {
-    const existingUser = DUMMY_USERS.find(u => u.email === registerData.email);
-    
-    if (existingUser) {
-      throw new Error('Email already exists');
-    }
-    
-    const newUser: User = {
-      _id: `user_${Date.now()}`,
-      name: registerData.name,
-      email: registerData.email,
-      password: registerData.password,
-      role: 'user',
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    const { password, ...userWithoutPassword } = newUser;
-    localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
-    localStorage.setItem('token', 'dummy-jwt-token');
-    this.currentUserSubject.next(userWithoutPassword as User);
-    
-    return of(userWithoutPassword as User).pipe(delay(500));
-  }
+  return this.http.post<LoginResponse>(
+    `${this.API_URL}/register`,
+    registerData
+  ).pipe(
+    map(response => this.handleAuthResponse(response)),
+    catchError(error => throwError(() => error))
+  );
+}
+
 
   logout(): void {
+
     localStorage.removeItem('currentUser');
     localStorage.removeItem('token');
+
     this.currentUserSubject.next(null);
+    this.cartService.loadCart().subscribe({error: error => { console.error('Failed to load cart after logout:', error); }});
+    this.wishlistService.loadWishlist().subscribe({error: error => { console.error('Failed to load wishlist after logout:', error); }});
   }
+
 
   isLoggedIn(): boolean {
     return this.currentUserSubject.value !== null;
   }
 
+
   isAdmin(): boolean {
     return this.currentUserSubject.value?.role === 'admin';
   }
 
+
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
+
 }

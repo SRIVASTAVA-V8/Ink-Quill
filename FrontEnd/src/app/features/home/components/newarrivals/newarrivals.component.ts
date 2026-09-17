@@ -4,12 +4,12 @@ import { CartService } from '../../../../services/cart.service';
 import { Book } from '../../../../models/book.model';
 
 @Component({
-  selector: 'app-featured-books',
-  templateUrl: './featured-books.component.html',
-  styleUrls: ['./featured-books.component.css']
+  selector: 'app-newarrivals',
+  templateUrl: './newarrivals.component.html',
+  styleUrls: ['./newarrivlas.component.css']
 })
 export class FeaturedBooksComponent implements OnInit {
-  featuredBooks: Book[] = [];
+  newarrivals: Book[] = [];
 
   constructor(
     private bookService: BookService,
@@ -18,7 +18,7 @@ export class FeaturedBooksComponent implements OnInit {
 
   ngOnInit() {
     this.bookService.getNewReleases().subscribe(books => {
-      this.featuredBooks = books;
+      this.newarrivals = books.books;
     });
   }
 

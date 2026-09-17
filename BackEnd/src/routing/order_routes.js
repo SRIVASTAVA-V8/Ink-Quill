@@ -89,7 +89,7 @@ routing.post('/verify-payment', async (req, res) => {
   }
 });
 //── Payment failure (user closed popup / payment declined) ────────────────────
-router.post('/payment-failed', async (req, res) => {
+routing.post('/payment-failed', async (req, res) => {
   try {
     const { orderId } = req.body;
     await orderService.handlePaymentFailure(req.user._id, orderId);

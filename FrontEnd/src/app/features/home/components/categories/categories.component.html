@@ -1,16 +1,139 @@
-<section class="py-20 bg-gray-50 dark:bg-gray-800">
-      <div class="container mx-auto px-6">
-        <h2 class="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-          Shop by Category
-        </h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
-          <div *ngFor="let category of categories" 
-               (click)="navigateToCategory(category.name)"
-               class="group cursor-pointer text-center p-6 rounded-2xl bg-white dark:bg-gray-700 shadow-md hover:shadow-xl transition-all transform hover:-translate-y-2">
-            <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">{{ category.icon }}</div>
-            <h3 class="font-semibold text-gray-900 dark:text-white">{{ category.name }}</h3>
-            <p class="text-sm text-gray-500 mt-1">{{ category.count }}+ books</p>
-          </div>
+<section id="categories" class="py-20 bg-background">
+  <div class="container mx-auto px-6">
+
+    <!-- Section Header -->
+    <div class="text-center mb-12">
+
+      <span
+        class="
+          inline-block
+          mb-3
+          text-sm
+          font-semibold
+          tracking-widest
+          uppercase
+          text-secondary
+        "
+      >
+        Explore our collection
+      </span>
+
+      <h2
+        class="
+          text-3xl
+          md:text-4xl
+          font-bold
+          text-heading
+          mb-4
+        "
+      >
+        Shop by Category
+      </h2>
+
+      <p
+        class="
+          max-w-2xl
+          mx-auto
+          text-body
+          text-base
+        "
+      >
+        Find your next favorite read from our carefully curated
+        collection of books.
+      </p>
+
+    </div>
+
+
+    <!-- Categories -->
+    <div
+      class="
+        grid
+        grid-cols-2
+        md:grid-cols-3
+        lg:grid-cols-7
+        gap-4
+      "
+    >
+
+      <div
+        *ngFor="let category of categories"
+        (click)="navigateToCategory(category.name)"
+        class="
+          group
+          cursor-pointer
+          text-center
+          p-6
+          rounded-2xl
+          bg-surface
+          border
+          border-border
+          shadow-sm
+
+          hover:shadow-lg
+          hover:-translate-y-1
+          hover:border-secondary
+
+          transition-all
+          duration-300
+        "
+      >
+
+        <!-- Icon -->
+        <div
+          class="
+            w-14
+            h-14
+            mx-auto
+            mb-4
+            rounded-full
+            bg-secondary/10
+            flex
+            items-center
+            justify-center
+            text-3xl
+
+            group-hover:bg-secondary/20
+            group-hover:scale-110
+
+            transition-all
+            duration-300
+          "
+        >
+          {{ category.icon }}
         </div>
+
+
+        <!-- Category Name -->
+        <h3
+          class="
+            font-semibold
+            text-heading
+            text-sm
+            md:text-base
+            group-hover:text-secondary
+            transition-colors
+            duration-200
+          "
+        >
+          {{ category.name }}
+        </h3>
+
+
+        <!-- Book Count -->
+        <p
+          class="
+            text-sm
+            text-body
+            mt-1
+          "
+        >
+          {{ category.count }}+ books
+        </p>
+
       </div>
-    </section>
+
+    </div>
+
+  </div>
+</section>

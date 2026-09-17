@@ -26,6 +26,5 @@ export interface Book {
 export interface RelatedBooks {
   bySameAuthor: Book[];
   bySameCategory: Book[];
-  bestsellersInCategory: Book[];
-  recommendedForYou: Book[];
+  popularPicks: Book[]; 
 }
