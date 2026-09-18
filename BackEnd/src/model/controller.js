@@ -1,6 +1,7 @@
 const User = require('./users');
 const Book = require('./books');
 const Cart = require('./cart');
+const Order = require('./order');
 const Wishlist = require('./wishlist');
 let dblayer = {};
 
@@ -95,33 +96,50 @@ dblayer.countOrdersByUser = async (userId) => {
 }
 dblayer.getOrderHistory = async (userId, page, limit, skip) => {
     return await Order.find({ userId })
-        .sort({ placedAt: -1 })
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .select('_id items totalAmount orderStatus shippingAddress paymentInfo deliveredAt placedAt');
+        .populate(
+      'items.bookId',
+      'title author price image'
+    );
 };
 dblayer.getOrderDetails = async (userId, orderId) => {
-    return await    Order.findOne({ _id: orderId, userId }).populate('items.bookId', 'title author price image ');
+    return await  Order.findOne({ _id: orderId, userId }).populate('items.bookId', 'title author price image ');
 };
-dblayer.confirmRazorpayPayment = async (orderId, razorpayOrderId, razorpayPaymentId) => {
-  return await Order.findByIdAndUpdate(
-    orderId,
+dblayer.confirmRazorpayPayment = async (
+  orderId,
+  razorpayOrderId,
+  razorpayPaymentId,
+  razorpaySignature,
+  session
+) => {
+
+  return await Order.findOneAndUpdate(
+    { _id: orderId },
+
     {
       $set: {
-        paymentStatus:     'paid',
-        orderStatus:       'confirmed',
-        confirmedAt:       new Date(),
-        razorpayOrderId,
-        razorpayPaymentId,
-      },
+        'paymentInfo.status': 'paid',
+        'paymentInfo.razorpayOrderId': razorpayOrderId,
+        'paymentInfo.razorpayPaymentId': razorpayPaymentId,
+        'paymentInfo.razorpaySignature': razorpaySignature,
+        'paymentInfo.paidAt': new Date(),
+
+        orderStatus: 'processing'
+      }
     },
-    { new: true }
+
+    {
+      new: true,
+      session
+    }
   );
 };
 dblayer.markPaymentFailed = async (orderId) => {
   return await Order.findByIdAndUpdate(
     orderId,
-    { $set: { paymentStatus: 'failed', orderStatus: 'placed' } },
+    { $set: {'paymentInfo.status': 'failed'} },
     { new: true }
   );
 };

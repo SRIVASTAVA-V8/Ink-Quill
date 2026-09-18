@@ -47,14 +47,9 @@ routing.get('/track/:orderId', async (req, res) => {
         const order = await service.checkout(userId, paymentMethod, shippingAddress);       
         return res.status(201).json({
         success: true,
-        message: 'Order placed successfully',
-        order: {
-        id:          order._id,
-        totalAmount: order.totalAmount,
-        orderStatus: order.orderStatus,
-        placedAt:    order.placedAt,
-      },
-    });
+        message: order.paymentMethod==='cod' ? 'Order placed successfully' : 'Payment initialized successfully',
+        ...order
+        });
     }
         catch (error) { 
         console.log(error);
@@ -66,7 +61,7 @@ routing.post('/verify-payment', async (req, res) => {
   try {
     const { orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
 
-    const order = await orderService.verifyPayment(
+    const order = await service.verifyPayment(
       req.user._id,
       orderId,
       razorpayOrderId,
@@ -77,11 +72,7 @@ routing.post('/verify-payment', async (req, res) => {
     return res.json({
       success: true,
       message: 'Payment verified. Order confirmed.',
-      order: {
-        id:          order._id,
-        totalAmount: order.totalAmount,
-        orderStatus: order.orderStatus,
-      },
+      order
     });
 
   } catch (err) {
@@ -92,7 +83,7 @@ routing.post('/verify-payment', async (req, res) => {
 routing.post('/payment-failed', async (req, res) => {
   try {
     const { orderId } = req.body;
-    await orderService.handlePaymentFailure(req.user._id, orderId);
+    await service.handlePaymentFailure(req.user._id, orderId);
     return res.json({ success: true, message: 'Order marked as payment failed.' });
 
   } catch (err) {

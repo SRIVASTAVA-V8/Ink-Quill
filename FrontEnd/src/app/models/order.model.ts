@@ -32,6 +32,7 @@ export interface Pricing {
   subtotal: number;
   discount: number;               // default: 0
   deliveryCharges: number;        // default: 0
+  tax:number,
   total: number;                  // required
 }
 

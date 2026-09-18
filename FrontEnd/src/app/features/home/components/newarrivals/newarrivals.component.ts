@@ -6,7 +6,7 @@ import { Book } from '../../../../models/book.model';
 @Component({
   selector: 'app-newarrivals',
   templateUrl: './newarrivals.component.html',
-  styleUrls: ['./newarrivlas.component.css']
+  styleUrls: ['./newarrivals.component.css']
 })
 export class FeaturedBooksComponent implements OnInit {
   newarrivals: Book[] = [];
