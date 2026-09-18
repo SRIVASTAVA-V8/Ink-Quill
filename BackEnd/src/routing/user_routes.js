@@ -27,9 +27,7 @@ routing.post('/register', async (req, res) => {
 });
 
 routing.post('/login', async (req, res) => {
-       const logindetails = req.body;
-       console.log("session id while logging ",req.cookies['sessionId']);
-       
+       const logindetails = req.body;   
        try {
            const result = await service.loginUser(logindetails);    
            const sessionId = req.cookies['sessionId'];

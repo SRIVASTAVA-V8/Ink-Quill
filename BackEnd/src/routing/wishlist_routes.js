@@ -7,7 +7,6 @@ const public_routes = [authMiddleware.optionalAuth, authMiddleware.validateGuest
 
 // Add book to wishlist
 routing.post('/add', ...public_routes, async (req, res) => {
-    console.log('entered in routing...addToWishlist', req.body);
     const { bookId } = req.body;
     const userId = req.user ? req.user._id : null;
     const sessionId = req.sessionId;
