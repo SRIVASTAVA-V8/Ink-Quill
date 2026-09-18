@@ -10,7 +10,7 @@ const wishlistRoutes=require('./routing/wishlist_routes');
 const orderRoutes=require('./routing/order_routes');
 const adminRoutes=require('./routing/admin_routes');
 const cookieParser=require('cookie-parser');
-
+dotenv.config();
 const app=express();
 
 
@@ -20,7 +20,7 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(cookieParser());
-dotenv.config();
+
 app.get('/',(req,res)=>{
     res.send("Welcome to Ink&Quill API");
 });
