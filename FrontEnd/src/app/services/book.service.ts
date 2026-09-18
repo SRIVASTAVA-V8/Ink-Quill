@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable,forkJoin} from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 import {
   Book,
@@ -51,7 +52,7 @@ export interface BooksResponse {
 export class BookService {
 
   private readonly API_URL =
-    'http://localhost:3000/api/collection';
+    `${environment.apiUrl}/collection`;
 
 
   constructor(

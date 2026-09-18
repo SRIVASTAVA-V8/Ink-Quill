@@ -4,6 +4,7 @@ import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
 import { Wishlist,WishlistItem } from '../models/wishlist.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ import { Wishlist,WishlistItem } from '../models/wishlist.model';
 export class WishlistService {
 
   private readonly API_URL =
-    'http://localhost:3000/api/wishlist';
+    `${environment.apiUrl}/wishlist`;
 
   private wishlistSubject =
     new BehaviorSubject<Wishlist>(

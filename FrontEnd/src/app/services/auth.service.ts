@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map} from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
 import { User, LoginData, RegisterData } from '../models/user.model';
 import { CartService } from './cart.service';
 import { WishlistService } from './wishlist.service';
+import { environment } from 'src/environments/environment.prod';
 
 interface LoginResponse {
   user: {
@@ -22,7 +23,7 @@ interface LoginResponse {
 })
 export class AuthService {
 
-  private readonly API_URL = 'http://localhost:3000/api/user';
+  private readonly API_URL = `${environment.apiUrl}/user`;
 
   private currentUserSubject =
     new BehaviorSubject<User | null>(

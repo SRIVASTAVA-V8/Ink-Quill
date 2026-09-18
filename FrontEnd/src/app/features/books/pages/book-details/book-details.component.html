@@ -8,7 +8,7 @@
       <div *ngIf="book" class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
         <!-- Book Cover -->
           <div class="sticky top-24">
-          <img [src]="book.image?.[0]" [alt]="book.title" class="w-full rounded-xl shadow-2xl">
+          <img [src]="book.image[0]" [alt]="book.title" class="w-full rounded-xl shadow-2xl">
         </div>
         
         <!-- Book Info -->
