@@ -1,4 +1,4 @@
-const dblayer = require('../model/controller');
+const dblayer = require('../controller/controller');
 
 const adminService = {};
 

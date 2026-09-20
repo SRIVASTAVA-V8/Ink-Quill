@@ -1,5 +1,5 @@
 const { default: mongoose } = require('mongoose');
-const dblayer = require('../model/controller');
+const dblayer = require('../controller/controller');
 const jwt = require('jsonwebtoken');
 
 

@@ -1,8 +1,8 @@
-const User = require('./users');
-const Book = require('./books');
-const Cart = require('./cart');
-const Order = require('./order');
-const Wishlist = require('./wishlist');
+const User = require('../model/users');
+const Book = require('../model/books');
+const Cart = require('../model/cart');
+const Order = require('../model/order');
+const Wishlist = require('../model/wishlist');
 let dblayer = {};
 
 // Function to find a user by email
