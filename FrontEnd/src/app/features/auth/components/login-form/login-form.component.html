@@ -1,51 +1,108 @@
-<div class="p-10">
+<div class="p-8 sm:p-10 lg:p-12">
 
-  <h2 class="text-4xl font-bold mb-8">
-    Welcome Back
-  </h2>
+  <!-- Header -->
+  <div class="mb-8">
+    <p class="text-xs font-semibold tracking-[0.25em] text-[#86A584] mb-3">
+      WELCOME TO INK&QUILL
+    </p>
 
-  <form class="space-y-5">
+    <h2 class="text-3xl sm:text-4xl font-serif font-bold text-[#243048]">
+      Welcome Back
+    </h2>
 
-    <input 
-      type="email"
-      name="email"
-      placeholder="Email"
-      class="w-full border p-4 rounded-xl"
-      [(ngModel)]="LoginData.email"
-    >
+    <p class="text-[#667085] mt-2">
+      Continue your reading journey.
+    </p>
+  </div>
 
-    <input 
-      type="password"
-      name="password"
-      placeholder="Password"
-      class="w-full border p-4 rounded-xl"
-      [(ngModel)]="LoginData.password"
-    >
+  <form
+    class="space-y-5"
+    (ngSubmit)="onLogin()"
+  >
 
+    <!-- Email -->
+    <div>
+      <label
+        for="login-email"
+        class="block text-sm font-semibold text-[#252A34] mb-2"
+      >
+        Email Address
+      </label>
+
+      <input
+        id="login-email"
+        type="email"
+        name="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+        class="w-full px-4 py-3 border border-[#D2CBC3] rounded-lg
+               bg-white text-[#252A34] outline-none transition
+               placeholder:text-[#98A0AA]
+               focus:ring-2 focus:ring-[#86A584]/20
+               focus:border-[#86A584]"
+        [(ngModel)]="LoginData.email"
+      >
+    </div>
+
+    <!-- Password -->
+    <div>
+      <label
+        for="login-password"
+        class="block text-sm font-semibold text-[#252A34] mb-2"
+      >
+        Password
+      </label>
+
+      <input
+        id="login-password"
+        type="password"
+        name="password"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+        class="w-full px-4 py-3 border border-[#D2CBC3] rounded-lg
+               bg-white text-[#252A34] outline-none transition
+               placeholder:text-[#98A0AA]
+               focus:ring-2 focus:ring-[#86A584]/20
+               focus:border-[#86A584]"
+        [(ngModel)]="LoginData.password"
+      >
+    </div>
+
+    <!-- Forgot Password -->
     <div class="text-right">
       <a
         routerLink="/auth/forgot-password"
-        class="text-amber-500"
+        class="text-sm text-[#243048] hover:text-[#86A584]
+               font-medium transition"
       >
         Forgot Password?
       </a>
     </div>
 
+    <!-- Login -->
     <button
-      class="w-full bg-black text-white py-4 rounded-xl" (click)="onLogin()"
+      type="submit"
+      class="w-full bg-[#243048] hover:bg-[#1B2639]
+             text-white py-3 rounded-lg
+             font-semibold transition
+             shadow-sm hover:shadow-md"
     >
       Login
     </button>
 
   </form>
 
-  <p class="mt-6 text-center">
+  <!-- Register -->
+  <p class="mt-7 pt-6 border-t border-[#E5DFD7] text-center text-sm">
 
-    Don't have an account?
+    <span class="text-[#667085]">
+      Don't have an account?
+    </span>
 
     <a
       routerLink="/auth/register"
-      class="text-amber-500 font-semibold"
+      class="ml-1 text-[#D4A017] hover:text-[#A77C08]
+             font-semibold transition"
     >
       Register
     </a>

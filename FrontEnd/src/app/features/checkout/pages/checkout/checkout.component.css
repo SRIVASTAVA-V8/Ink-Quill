@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+.checkout-progress {
+  position: relative;
+}
+
+.progress-track {
+  position: absolute;
+  top: 16px;
+  left: 13%;
+  right: 13%;
+  height: 1px;
+}
+
+.progress-step {
+  position: relative;
+  z-index: 1;
+}
+
+.progress-fill {
+  transition: width 0.3s ease;
+}
+
+.form-control.invalid {
+  border-color: #c96b6b;
+}
+
+.spinner {
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 600px) {
+  .checkout-progress {
+    max-width: 100%;
+  }
+}

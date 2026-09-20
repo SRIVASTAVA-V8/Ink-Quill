@@ -15,10 +15,10 @@ const TAX_RATE = 0.18;
 
 const buildStockBulkOps = (cartItems) => {
 
-  return cartItems.map(({ book, quantity }) => ({
+  return cartItems.map(({ bookId, quantity }) => ({
     updateOne: {
       filter: {
-        _id: book._id,
+        _id: bookId._id,
         stock: { $gte: quantity }
       },
       update: {
@@ -38,10 +38,10 @@ const buildStockBulkOps = (cartItems) => {
 
 const buildOrderItems = (cartItems) => {
 
-  return cartItems.map(({ book, quantity }) => ({
-    bookId: book._id,
-    title: book.title,
-    price: book.price,
+  return cartItems.map(({ bookId, quantity }) => ({
+    bookId: bookId._id,
+    title: bookId.title,
+    price: bookId.price,
     quantity
   }));
 
@@ -55,8 +55,8 @@ const buildOrderItems = (cartItems) => {
 const calculatePricing = (cartItems) => {
 
   const subtotal = cartItems.reduce(
-    (sum, { book, quantity }) =>
-      sum + book.price * quantity,
+    (sum, { bookId, quantity }) =>
+      sum + bookId.price * quantity,
     0
   );
 
@@ -97,17 +97,17 @@ const calculatePricing = (cartItems) => {
 
 const validateCartItems = (cartItems) => {
 
-  for (const { book, quantity } of cartItems) {
+  for (const { bookId, quantity } of cartItems) {
 
-    if (!book) {
+    if (!bookId) {
       throw new Error(
         'One or more books no longer exist'
       );
     }
 
-    if (book.stock < quantity) {
+    if (bookId.stock < quantity) {
       throw new Error(
-        `"${book.title}" only has ${book.stock} copies left`
+        `"${bookId.title}" only has ${bookId.stock} copies left`
       );
     }
 
@@ -260,11 +260,30 @@ orderService.trackShipping = async (
 // CHECKOUT
 // -----------------------------------------
 
+orderService.getCheckoutPreview = async (userId) => {
+  const cart = await dblayer.getCart({ userId });
+
+  if (!cart || cart.items.length === 0) {
+    throw new Error('Cart is empty');
+  }
+
+  validateCartItems(cart.items);
+
+  return calculatePricing(cart.items);
+};
+
 orderService.checkout = async (
   userId,
   paymentMethod,
   shippingAddress
 ) => {
+  const normalizedPaymentMethod =
+    paymentMethod.toUpperCase();
+
+  if (!['CARD', 'UPI', 'COD'].includes(normalizedPaymentMethod)) {
+    throw new Error('Invalid payment method');
+  }
+
 
   const session =
     await mongoose.startSession();
@@ -330,7 +349,7 @@ orderService.checkout = async (
           pricing,
 
           paymentInfo: {
-            method: paymentMethod,
+            method: normalizedPaymentMethod,
             status: 'pending'
           },
 
@@ -345,7 +364,7 @@ orderService.checkout = async (
     // COD
     // -----------------------------------
 
-    if (paymentMethod === 'cod') {
+    if (normalizedPaymentMethod === 'COD') {
 
       await decrementStockAndClearCart(
         bulkOps,
@@ -383,7 +402,7 @@ orderService.checkout = async (
       await razorpayService.createRazorpayOrder(
         pricing.total,
         createdOrder._id,
-        paymentMethod
+        normalizedPaymentMethod.toLowerCase()
       );
 
 
@@ -401,7 +420,7 @@ orderService.checkout = async (
 
     return {
 
-      paymentMethod,
+      paymentMethod: normalizedPaymentMethod.toLowerCase(),
 
       order: createdOrder,
 

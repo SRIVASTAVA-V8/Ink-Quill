@@ -1,22 +1,23 @@
 <div class="p-8 sm:p-10 lg:p-12">
 
   <!-- Header -->
-
   <div class="mb-8">
 
     <p
-      class="text-xs font-semibold tracking-[0.25em] text-amber-700 mb-3"
+      class="text-xs font-semibold tracking-[0.25em]
+             text-[#86A584] mb-3"
     >
       JOIN INK&QUILL
     </p>
 
     <h2
-      class="text-3xl sm:text-4xl font-serif font-bold text-gray-900"
+      class="text-3xl sm:text-4xl
+             font-serif font-bold text-[#243048]"
     >
       Create Your Account
     </h2>
 
-    <p class="text-gray-500 mt-2">
+    <p class="text-[#667085] mt-2">
       Start your reading journey today.
     </p>
 
@@ -24,20 +25,24 @@
 
 
   <!-- Error -->
-
   <div
     *ngIf="errorMessage"
-    class="mb-5 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm"
+    class="mb-5 px-4 py-3 rounded-lg
+           bg-[#FDF0F0]
+           border border-[#C96B6B]/30
+           text-[#C96B6B] text-sm"
   >
     {{ errorMessage }}
   </div>
 
 
   <!-- Success -->
-
   <div
     *ngIf="successMessage"
-    class="mb-5 px-4 py-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm"
+    class="mb-5 px-4 py-3 rounded-lg
+           bg-[#EEF5EE]
+           border border-[#6F9B7A]/30
+           text-[#6F9B7A] text-sm"
   >
     {{ successMessage }}
   </div>
@@ -49,14 +54,13 @@
     *ngIf="!successMessage"
   >
 
-
     <!-- Name -->
-
     <div class="mb-5">
 
       <label
         for="name"
-        class="block text-sm font-semibold text-gray-700 mb-2"
+        class="block text-sm font-semibold
+               text-[#252A34] mb-2"
       >
         Full Name
       </label>
@@ -67,15 +71,23 @@
         formControlName="name"
         placeholder="Enter your full name"
         autocomplete="name"
-        class="w-full px-4 py-3 border rounded-lg outline-none transition focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600"
-        [class.border-red-400]="isFieldInvalid('name')"
-        [class.border-gray-300]="!isFieldInvalid('name')"
+        class="w-full px-4 py-3
+               border rounded-lg
+               bg-white
+               text-[#252A34]
+               placeholder:text-[#98A0AA]
+               outline-none transition
+               focus:ring-2 focus:ring-[#86A584]/20
+               focus:border-[#86A584]"
+        [class.border-[#C96B6B]]="isFieldInvalid('name')"
+        [class.border-[#D2CBC3]]="!isFieldInvalid('name')"
       />
 
       <p
         *ngIf="isFieldInvalid('name')"
-        class="text-xs text-red-600 mt-1.5"
+        class="text-xs text-[#C96B6B] mt-1.5"
       >
+
         <span *ngIf="f['name'].errors?.['required']">
           Name is required.
         </span>
@@ -87,18 +99,19 @@
         <span *ngIf="f['name'].errors?.['maxlength']">
           Name cannot exceed 50 characters.
         </span>
+
       </p>
 
     </div>
 
 
     <!-- Email -->
-
     <div class="mb-5">
 
       <label
         for="email"
-        class="block text-sm font-semibold text-gray-700 mb-2"
+        class="block text-sm font-semibold
+               text-[#252A34] mb-2"
       >
         Email Address
       </label>
@@ -109,15 +122,23 @@
         formControlName="email"
         placeholder="you@example.com"
         autocomplete="email"
-        class="w-full px-4 py-3 border rounded-lg outline-none transition focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600"
-        [class.border-red-400]="isFieldInvalid('email')"
-        [class.border-gray-300]="!isFieldInvalid('email')"
+        class="w-full px-4 py-3
+               border rounded-lg
+               bg-white
+               text-[#252A34]
+               placeholder:text-[#98A0AA]
+               outline-none transition
+               focus:ring-2 focus:ring-[#86A584]/20
+               focus:border-[#86A584]"
+        [class.border-[#C96B6B]]="isFieldInvalid('email')"
+        [class.border-[#D2CBC3]]="!isFieldInvalid('email')"
       />
 
       <p
         *ngIf="isFieldInvalid('email')"
-        class="text-xs text-red-600 mt-1.5"
+        class="text-xs text-[#C96B6B] mt-1.5"
       >
+
         <span *ngIf="f['email'].errors?.['required']">
           Email is required.
         </span>
@@ -125,18 +146,19 @@
         <span *ngIf="f['email'].errors?.['email']">
           Please enter a valid email address.
         </span>
+
       </p>
 
     </div>
 
 
     <!-- Password -->
-
     <div class="mb-5">
 
       <label
         for="password"
-        class="block text-sm font-semibold text-gray-700 mb-2"
+        class="block text-sm font-semibold
+               text-[#252A34] mb-2"
       >
         Password
       </label>
@@ -149,15 +171,26 @@
           formControlName="password"
           placeholder="Create a password"
           autocomplete="new-password"
-          class="w-full px-4 py-3 pr-12 border rounded-lg outline-none transition focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600"
-          [class.border-red-400]="isFieldInvalid('password')"
-          [class.border-gray-300]="!isFieldInvalid('password')"
+          class="w-full px-4 py-3 pr-12
+                 border rounded-lg
+                 bg-white
+                 text-[#252A34]
+                 placeholder:text-[#98A0AA]
+                 outline-none transition
+                 focus:ring-2 focus:ring-[#86A584]/20
+                 focus:border-[#86A584]"
+          [class.border-[#C96B6B]]="isFieldInvalid('password')"
+          [class.border-[#D2CBC3]]="!isFieldInvalid('password')"
         />
 
         <button
           type="button"
           (click)="togglePassword()"
-          class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
+          class="absolute right-3 top-1/2
+                 -translate-y-1/2
+                 text-[#98A0AA]
+                 hover:text-[#243048]
+                 transition"
         >
           {{ showPassword ? '🙈' : '👁' }}
         </button>
@@ -166,28 +199,37 @@
 
 
       <!-- Requirements -->
-         <div class="mt-3 space-y-1 text-xs">
+      <div class="mt-3 space-y-1 text-xs">
 
-            <p
-               [class.text-green-600]="f['password'].value?.length >= 8 " [class.text-gray-400]="f['password'].value?.length < 8">
-              ✓ At least 8 characters
-            </p>
+        <p
+          [class.text-[#6F9B7A]]="f['password'].value?.length >= 8"
+          [class.text-[#98A0AA]]="f['password'].value?.length < 8"
+        >
+          ✓ At least 8 characters
+        </p>
 
+        <p
+          [class.text-[#6F9B7A]]="hasUppercase()"
+          [class.text-[#98A0AA]]="!hasUppercase()"
+        >
+          ✓ One uppercase letter
+        </p>
 
-            <p [class.text-green-600]="hasUppercase()" [class.text-gray-400]="!hasUppercase()">
-             ✓ One uppercase letter
-            </p>
+        <p
+          [class.text-[#6F9B7A]]="hasNumber()"
+          [class.text-[#98A0AA]]="!hasNumber()"
+        >
+          ✓ One number
+        </p>
 
-            <p [class.text-green-600]="hasNumber()" [class.text-gray-400]="!hasNumber()">
-                ✓ One number
-            </p>
+        <p
+          [class.text-[#6F9B7A]]="hasSpecialCharacter()"
+          [class.text-[#98A0AA]]="!hasSpecialCharacter()"
+        >
+          ✓ One special character
+        </p>
 
-            <p [class.text-green-600]="hasSpecialCharacter()"[class.text-gray-400]="!hasSpecialCharacter()">
-             ✓ One special character
-            </p>
-
-        </div>
-      
+      </div>
 
     </div>
 
@@ -196,91 +238,113 @@
     <div class="mb-5">
 
       <label
-      for="confirmPassword"
-       class="block text-sm font-semibold text-gray-700 mb-2">
-       Confirm Password
+        for="confirmPassword"
+        class="block text-sm font-semibold
+               text-[#252A34] mb-2"
+      >
+        Confirm Password
       </label>
 
       <div class="relative">
 
-      <input
-      id="confirmPassword"
-      [type]="showConfirmPassword ? 'text' : 'password'"
-      formControlName="confirmPassword"
-      placeholder="Confirm your password"
-      autocomplete="new-password"
-      class="w-full px-4 py-3 pr-12 border rounded-lg outline-none transition focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600"
-      [class.border-red-400]="
-        (f['confirmPassword'].touched || submitted) &&
-        registerForm.errors?.['passwordMismatch']
-      "
-      [class.border-gray-300]="
-        !(
-          (f['confirmPassword'].touched || submitted) &&
-          registerForm.errors?.['passwordMismatch']
-        )
-      "
-       />
+        <input
+          id="confirmPassword"
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          formControlName="confirmPassword"
+          placeholder="Confirm your password"
+          autocomplete="new-password"
+          class="w-full px-4 py-3 pr-12
+                 border rounded-lg
+                 bg-white
+                 text-[#252A34]
+                 placeholder:text-[#98A0AA]
+                 outline-none transition
+                 focus:ring-2 focus:ring-[#86A584]/20
+                 focus:border-[#86A584]"
+          [class.border-[#C96B6B]]="
+            (f['confirmPassword'].touched || submitted) &&
+            registerForm.errors?.['passwordMismatch']
+          "
+          [class.border-[#D2CBC3]]="
+            !(
+              (f['confirmPassword'].touched || submitted) &&
+              registerForm.errors?.['passwordMismatch']
+            )
+          "
+        />
 
-      <button
-      type="button"
-      (click)="toggleConfirmPassword()"
-      class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800">
-      {{ showConfirmPassword ? '🙈' : '👁' }}
-      </button>
+        <button
+          type="button"
+          (click)="toggleConfirmPassword()"
+          class="absolute right-3 top-1/2
+                 -translate-y-1/2
+                 text-[#98A0AA]
+                 hover:text-[#243048]
+                 transition"
+        >
+          {{ showConfirmPassword ? '🙈' : '👁' }}
+        </button>
 
       </div>
 
 
-       <p
+      <p
         *ngIf="
-        (f['confirmPassword'].touched || submitted) &&
-         registerForm.errors?.['passwordMismatch'] "class="text-xs text-red-600 mt-1.5">
-         Passwords do not match.
-       </p>
+          (f['confirmPassword'].touched || submitted) &&
+          registerForm.errors?.['passwordMismatch']
+        "
+        class="text-xs text-[#C96B6B] mt-1.5"
+      >
+        Passwords do not match.
+      </p>
 
     </div>
-    
 
 
     <!-- Terms -->
-
     <div class="mb-6">
 
-      <label
-        class="flex items-start gap-2 cursor-pointer"
-      >
+      <label class="flex items-start gap-2 cursor-pointer">
 
         <input
           type="checkbox"
           formControlName="termsAccepted"
-          class="mt-1 accent-amber-700"
+          class="mt-1 accent-[#243048]"
         />
 
-        <span class="text-sm text-gray-600">
+        <span class="text-sm text-[#667085]">
+
           I agree to the
+
           <a
             href="#"
             (click)="$event.preventDefault()"
-            class="text-amber-700 hover:underline"
+            class="text-[#D4A017]
+                   hover:text-[#A77C08]
+                   hover:underline"
           >
             Terms of Service
           </a>
+
           and
+
           <a
             href="#"
             (click)="$event.preventDefault()"
-            class="text-amber-700 hover:underline"
+            class="text-[#D4A017]
+                   hover:text-[#A77C08]
+                   hover:underline"
           >
             Privacy Policy
           </a>
+
         </span>
 
       </label>
 
       <p
         *ngIf="isFieldInvalid('termsAccepted')"
-        class="text-xs text-red-600 mt-1"
+        class="text-xs text-[#C96B6B] mt-1"
       >
         You must accept the terms to continue.
       </p>
@@ -289,11 +353,18 @@
 
 
     <!-- Submit -->
-
     <button
       type="submit"
       [disabled]="loading"
-      class="w-full py-3 rounded-lg bg-amber-700 hover:bg-amber-800 text-white font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
+      class="w-full py-3 rounded-lg
+             bg-[#243048]
+             hover:bg-[#1B2639]
+             text-white
+             font-semibold
+             transition
+             shadow-sm hover:shadow-md
+             disabled:opacity-60
+             disabled:cursor-not-allowed"
     >
 
       <span *ngIf="!loading">
@@ -302,11 +373,17 @@
 
       <span
         *ngIf="loading"
-        class="flex items-center justify-center gap-2"
+        class="flex items-center
+               justify-center gap-2"
       >
 
         <span
-          class="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"
+          class="w-4 h-4
+                 border-2
+                 border-white/40
+                 border-t-white
+                 rounded-full
+                 animate-spin"
         ></span>
 
         Creating Account...
@@ -319,18 +396,20 @@
 
 
   <!-- Login -->
-
   <div
-    class="text-center mt-7 pt-6 border-t border-gray-100"
+    class="text-center mt-7 pt-6
+           border-t border-[#E5DFD7]"
   >
 
-    <span class="text-sm text-gray-500">
+    <span class="text-sm text-[#667085]">
       Already have an account?
     </span>
 
     <a
       routerLink="/auth/login"
-      class="ml-1 text-sm font-semibold text-amber-700 hover:text-amber-800"
+      class="ml-1 text-sm font-semibold
+             text-[#D4A017]
+             hover:text-[#A77C08]"
     >
       Sign In
     </a>

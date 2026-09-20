@@ -8,15 +8,15 @@ import { Router } from '@angular/router';
   styleUrls: ['./categories.component.css']
 })
 export class CategoriesComponent {
-  categories = [
-    { name: 'Fiction', icon: '📖', count: 1245 },
-    { name: 'Non-Fiction', icon: '📚', count: 876 },
-    { name: 'Sci-Fi', icon: '🚀', count: 654 },
-    { name: 'Biography', icon: '👤', count: 543 },
-    { name: 'Romance', icon: '💕', count: 987 },
-    { name: 'Mystery', icon: '🔍', count: 765 },
-    { name: 'Fantasy', icon: '🐉', count: 432 }
-  ];
+ categories = [
+  { name: 'Fiction', icon: 'menu_book' },
+  { name: 'Romance', icon: 'favorite_border' },
+  { name: 'Mystery', icon: 'search' },
+  { name: 'Science', icon: 'science' },
+  { name: 'Biography', icon: 'person_outline' },
+  { name: 'Self Help', icon: 'psychology' },
+  { name: 'History', icon: 'history_edu' }
+];
 
   constructor(private router: Router) {}
 

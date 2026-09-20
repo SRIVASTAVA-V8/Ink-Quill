@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import {
   Order,
   Address,
+  Pricing,
 } from '../models/order.model';
 
 import { environment } from '../../environments/environment';
@@ -15,6 +16,10 @@ export type PaymentMethod =
   | 'UPI'
   | 'COD';
 
+export interface CheckoutPreviewResponse {
+  success: boolean;
+  pricing: Pricing;
+}
 
 export interface CheckoutResponse {
   success: boolean;
@@ -63,16 +68,24 @@ export class OrderService {
     private http: HttpClient
   ) {}
 
+  getCheckoutPreview(): Observable<CheckoutPreviewResponse> {
+    return this.http.get<CheckoutPreviewResponse>(
+      `${this.apiUrl}/checkout/preview`
+    );
+  }
+
   checkout(
     paymentMethod: PaymentMethod,
-    shippingAddress: Address
+    shippingAddress: Address,
+    upiId?: string
   ): Observable<CheckoutResponse> {
 
     const result=  this.http.post<CheckoutResponse>(
       `${this.apiUrl}/checkout`,
       {
         paymentMethod: paymentMethod.toLowerCase(),
-        shippingAddress
+        shippingAddress,
+        ...(paymentMethod ==='UPI' &&{ upiId })
       }
     );
     console.log('Checkout Response:', result);

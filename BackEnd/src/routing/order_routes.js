@@ -40,6 +40,26 @@ routing.get('/track/:orderId', async (req, res) => {
     }
 });
 
+routing.get('/checkout/preview', async (req, res) => {
+  const userId = req.user._id;
+
+  try {
+    const pricing = await service.getCheckoutPreview(userId);
+
+    res.status(200).json({
+      success: true,
+      pricing
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
    routing.post('/checkout', validate_order, async (req, res) => {
     const userId = req.user._id;  
     const { paymentMethod, shippingAddress } = req.body; // Get payment and shipping details from request body
@@ -53,7 +73,7 @@ routing.get('/track/:orderId', async (req, res) => {
     }
         catch (error) { 
         console.log(error);
-        res.status(400).json({ message: error.message });
+        res.status(400).json({success: false, message: error.message });
     }
 });
 

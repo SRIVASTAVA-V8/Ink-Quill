@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { User, LoginData, RegisterData } from '../models/user.model';
 import { CartService } from './cart.service';
 import { WishlistService } from './wishlist.service';
-import { environment } from 'src/environments/environment.prod';
+import { environment } from 'src/environments/environment';
 
 interface LoginResponse {
   user: {

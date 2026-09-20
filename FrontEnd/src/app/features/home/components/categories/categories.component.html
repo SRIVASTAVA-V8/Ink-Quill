@@ -1,114 +1,88 @@
+<!-- Categories Section -->
 <section id="categories" class="py-20 bg-background">
-  <div class="container mx-auto px-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
     <!-- Section Header -->
     <div class="text-center mb-12">
-
       <span
-        class="
-          inline-block
-          mb-3
-          text-sm
-          font-semibold
-          tracking-widest
-          uppercase
-          text-secondary
-        "
+        class="text-sm font-semibold tracking-[0.2em] uppercase text-secondary"
       >
         Explore our collection
       </span>
 
       <h2
-        class="
-          text-3xl
-          md:text-4xl
-          font-bold
-          text-heading
-          mb-4
-        "
+        class="mt-3 text-3xl md:text-4xl font-serif font-bold text-heading"
       >
         Shop by Category
       </h2>
 
-      <p
-        class="
-          max-w-2xl
-          mx-auto
-          text-body
-          text-base
-        "
-      >
-        Find your next favorite read from our carefully curated
-        collection of books.
+      <p class="mt-4 text-body max-w-2xl mx-auto leading-relaxed">
+        Find your next favorite read from a collection curated for every kind
+        of reader.
       </p>
-
     </div>
 
+    <!-- Categories Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
 
-    <!-- Categories -->
-    <div
-      class="
-        grid
-        grid-cols-2
-        md:grid-cols-3
-        lg:grid-cols-7
-        gap-4
-      "
-    >
-
+      <!-- Category Card -->
       <div
         *ngFor="let category of categories"
         (click)="navigateToCategory(category.name)"
         class="
           group
           cursor-pointer
+          relative
+          px-5
+          py-7
           text-center
-          p-6
-          rounded-2xl
           bg-surface
           border
           border-border
-          shadow-sm
-
-          hover:shadow-lg
-          hover:-translate-y-1
           hover:border-secondary
-
+          hover:bg-[#F7F8F4]
           transition-all
           duration-300
         "
       >
 
-        <!-- Icon -->
+        <!-- Gold Accent -->
         <div
           class="
-            w-14
-            h-14
-            mx-auto
-            mb-4
-            rounded-full
-            bg-secondary/10
-            flex
-            items-center
-            justify-center
-            text-3xl
-
-            group-hover:bg-secondary/20
-            group-hover:scale-110
-
+            absolute
+            top-0
+            left-1/2
+            -translate-x-1/2
+            w-0
+            h-[2px]
+            bg-accent
+            group-hover:w-8
             transition-all
             duration-300
           "
-        >
-          {{ category.icon }}
-        </div>
+        ></div>
 
+        <!-- Category Icon -->
+        <div
+          class="
+            mb-5
+            text-primary/70
+            group-hover:text-secondary
+            transition-colors
+            duration-300
+          "
+        >
+          <span class="material-icons text-[28px]">
+            {{ category.icon }}
+          </span>
+        </div>
 
         <!-- Category Name -->
         <h3
           class="
+            font-serif
             font-semibold
-            text-heading
+            text-primary
             text-sm
             md:text-base
             group-hover:text-secondary
@@ -119,21 +93,8 @@
           {{ category.name }}
         </h3>
 
-
-        <!-- Book Count -->
-        <p
-          class="
-            text-sm
-            text-body
-            mt-1
-          "
-        >
-          {{ category.count }}+ books
-        </p>
-
       </div>
 
     </div>
-
   </div>
 </section>

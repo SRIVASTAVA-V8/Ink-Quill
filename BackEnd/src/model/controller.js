@@ -330,4 +330,8 @@ dblayer.searchBooksCount = async (filters) => {
     return await Book.countDocuments(filters);
 };
 
+dblayer.decrementStock = async (bulkOps, session) => {
+  return await Book.bulkWrite(bulkOps, { session });
+};
+
 module.exports = dblayer;
