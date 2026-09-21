@@ -196,11 +196,9 @@ export class BookService {
 
   getBook(id: string): Observable<Book> {
 
-  return this.http.get<{ book: Book }>(
-    `${this.API_URL}/item/${id}`
-  ).pipe(
-    map(response => response.book)
-  );
+  return this.http.get<Book>(
+    `${this.API_URL}/item/${id}`)
+  
 
 }
 

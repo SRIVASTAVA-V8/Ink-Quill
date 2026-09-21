@@ -1,93 +1,262 @@
-<div class="container mx-auto px-6 py-8">
-      <!-- Back Button -->
-      <button (click)="goBack()" class="mb-6 text-indigo-600 hover:text-indigo-700 flex items-center gap-2">
-        ← Back to Books
-      </button>
-      
-      <!-- Book Details -->
-      <div *ngIf="book" class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-        <!-- Book Cover -->
-          <div class="sticky top-24">
-          <img [src]="book.image[0]" [alt]="book.title" class="w-full rounded-xl shadow-2xl">
-        </div>
-        
-        <!-- Book Info -->
-        <div>
-          <h1 class="text-4xl font-bold mb-4">{{ book.title }}</h1>
-          <p class="text-xl text-body dark:text-gray-400 mb-4">by {{ book.author }}</p>
-          
-          <div class="flex items-center gap-4 mb-6">
-            <div class="flex items-center">
-              <span class="text-yellow-500 text-2xl">★</span>
-              <span class="text-xl ml-1">{{ book.ratingAvg }}</span>
-              <span class="text-gray-500 ml-2">({{ book.ratingCount }} reviews)</span>
-            </div>
-            <span *ngIf="book.stock > 0" class="text-green-600 font-semibold">✓ In Stock</span>
-            <span *ngIf="book.stock === 0" class="text-red-600 font-semibold">✗ Out of Stock</span>
-          </div>
-          
-          <div class="mb-6">
-            <span class="text-4xl font-bold text-indigo-600">\${{ getDiscountedPrice() }}</span>
-            <span *ngIf="book.discount > 0" class="ml-3 text-xl text-gray-500 line-through">\${{ book.price }}</span>
-            <span *ngIf="book.discount > 0" class="ml-3 text-green-600 font-semibold">-{{ book.discount }}% OFF</span>
-          </div>
-          
-          <div class="mb-6">
-            <label class="block font-semibold mb-3">Quantity:</label>
-            <div class="flex items-center gap-3">
-              <button (click)="decrementQuantity()" class="w-10 h-10 border rounded-lg hover:bg-gray-100">-</button>
-              <span class="text-xl w-12 text-center">{{ quantity }}</span>
-              <button (click)="incrementQuantity()" class="w-10 h-10 border rounded-lg hover:bg-gray-100">+</button>
-            </div>
-          </div>
-          
-          <div class="flex gap-4 mb-8">
-            <button (click)="addToCart()" 
-                    [disabled]="book.stock === 0"
-                    class="flex-1 bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 disabled:opacity-50 transition">
-              Add to Cart
-            </button>
-            <button (click)="toggleWishlist()" 
-                    class="px-8 py-3 border-2 rounded-lg font-semibold hover:bg-background transition">
-              {{ isInWishlist ? '❤️ Remove' : '🤍 Wishlist' }}
-            </button>
-          </div>
-          
-          <div class="border-t pt-6">
-            <h3 class="font-bold text-xl mb-3">Description</h3>
-            <p class="text-body dark:text-gray-400 leading-relaxed">{{ book.description }}</p>
-          </div>
-          
-          <div class="mt-6 grid grid-cols-2 gap-4">
-            <div>
-              <p class="text-sm text-gray-500">Publisher</p>
-              <p class="font-semibold">{{ book.publisher }}</p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500">Language</p>
-              <p class="font-semibold">{{ book.language }}</p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500">ISBN</p>
-              <p class="font-semibold">{{ book.ISBN }}</p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500">Category</p>
-              <p class="font-semibold">{{ book.category }}</p>
-            </div>
-          </div>
-          
-          <!-- Tags -->
-          <div class="mt-4 flex flex-wrap gap-2">
-            <span *ngFor="let tag of book.tags" 
-                  class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm">
-              #{{ tag }}
-            </span>
-          </div>
+<div class="min-h-screen bg-background">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Back Button -->
+    <button
+      (click)="goBack()"
+      class="mb-8 inline-flex items-center gap-2 text-sm font-medium text-body hover:text-primary transition-colors duration-200"
+    >
+      <span class="text-lg">←</span>
+      Back to Books
+    </button>
+
+    <!-- Book Details -->
+    <div
+      *ngIf="book"
+      class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 mb-20"
+    >
+
+      <!-- Book Cover -->
+      <div class="lg:sticky lg:top-24 self-start">
+        <div class="bg-surface border border-border p-4 shadow-sm">
+          <img
+            [src]="book.image[0]"
+            [alt]="book.title"
+            class="w-full max-h-[650px] object-contain"
+          />
         </div>
       </div>
 
-      <!-- Related Books -->
-      <app-related-books *ngIf="book"
-                         [book]="book">
-      </app-related-books>
+      <!-- Book Info -->
+      <div class="flex flex-col">
+
+        <!-- Category -->
+        <p
+          class="text-sm font-semibold tracking-[0.18em] uppercase text-secondary mb-3"
+        >
+          {{ book.category }}
+        </p>
+
+        <!-- Title -->
+        <h1
+          class="text-4xl md:text-5xl  font-bold leading-tight text-heading mb-4"
+        >
+          {{ book.title }}
+        </h1>
+
+        <!-- Author -->
+        <p class="text-lg text-body mb-6">
+          by
+          <span class="font-medium text-primary">
+            {{ book.author }}
+          </span>
+        </p>
+
+        <!-- Rating / Stock -->
+        <div
+          class="flex flex-wrap items-center gap-4 pb-6 mb-6 border-b border-border"
+        >
+
+          <!-- Rating -->
+          <div class="flex items-center gap-1">
+            <span class="text-accent text-xl">★</span>
+
+            <span class="font-semibold text-heading">
+              {{ book.ratingAvg }}
+            </span>
+
+            <span class="text-sm text-muted">
+              ({{ book.ratingCount }} reviews)
+            </span>
+          </div>
+
+          <span class="h-4 w-px bg-border"></span>
+
+          <!-- Stock -->
+          <span
+            *ngIf="book.stock > 0"
+            class="text-sm font-semibold text-success"
+          >
+            ✓ In Stock
+          </span>
+
+          <span
+            *ngIf="book.stock === 0"
+            class="text-sm font-semibold text-danger"
+          >
+            ✕ Out of Stock
+          </span>
+
+        </div>
+
+        <!-- Price -->
+        <div class="mb-7">
+
+          <div class="flex items-baseline flex-wrap gap-3">
+
+            <span
+              class="text-3xl md:text-4xl font-semibold text-primary"
+            >
+              {{ getDiscountedPrice() | currency :'INR' }}
+            </span>
+
+            <span
+              *ngIf="book.discount > 0"
+              class="text-lg text-muted line-through"
+            >
+              {{ book.price | currency:'INR' }}
+            </span>
+
+            <span
+              *ngIf="book.discount > 0"
+              class="text-sm font-semibold text-success"
+            >
+              {{ book.discount }}% OFF
+            </span>
+
+          </div>
+
+        </div>
+
+        <!-- Quantity -->
+        <div class="mb-7">
+
+          <label
+            class="block text-sm font-semibold text-heading mb-3"
+          >
+            Quantity
+          </label>
+
+          <div class="inline-flex items-center border border-border bg-surface">
+
+            <button
+              (click)="decrementQuantity()"
+              class="w-11 h-11 text-lg text-primary hover:bg-background transition-colors duration-200"
+            >
+              −
+            </button>
+
+            <span
+              class="w-12 text-center font-medium text-heading"
+            >
+              {{ quantity }}
+            </span>
+
+            <button
+              (click)="incrementQuantity()"
+              class="w-11 h-11 text-lg text-primary hover:bg-background transition-colors duration-200"
+            >
+              +
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-3 mb-9">
+
+          <button
+            (click)="addToCart()"
+            [disabled]="book.stock === 0"
+            class="flex-1 bg-primary text-white px-8 py-3.5 font-semibold hover:bg-[#1B2639] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          >
+            Add to Cart
+          </button>
+
+          <button
+            (click)="toggleWishlist()"
+            class="sm:px-7 px-8 py-3.5 border border-border text-primary font-semibold hover:bg-background hover:border-secondary transition-colors duration-200"
+          >
+            {{ isInWishlist ? '♥ Remove' : '♡ Wishlist' }}
+          </button>
+
+        </div>
+
+        <!-- Description -->
+        <div class="border-t border-border pt-7">
+
+          <h3
+            class="text-xl  font-bold text-heading mb-3"
+          >
+            About this book
+          </h3>
+
+          <p
+            class="text-body leading-relaxed"
+          >
+            {{ book.description }}
+          </p>
+
+        </div>
+
+        <!-- Book Details -->
+        <div
+          class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 border-t border-border pt-7"
+        >
+
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted mb-1">
+              Publisher
+            </p>
+            <p class="font-medium text-heading">
+              {{ book.publisher }}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted mb-1">
+              Language
+            </p>
+            <p class="font-medium text-heading">
+              {{ book.language }}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted mb-1">
+              ISBN
+            </p>
+            <p class="font-medium text-heading">
+              {{ book.ISBN }}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted mb-1">
+              Category
+            </p>
+            <p class="font-medium text-heading">
+              {{ book.category }}
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Tags -->
+        <div
+          *ngIf="book.tags?.length"
+          class="mt-7 flex flex-wrap gap-2"
+        >
+
+          <span
+            *ngFor="let tag of book.tags"
+            class="px-3 py-1.5 border border-border text-xs text-body bg-surface"
+          >
+            #{{ tag }}
+          </span>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Related Books -->
+    <app-related-books
+      *ngIf="book"
+      [book]="book"
+    >
+    </app-related-books>
+
+  </div>
+</div>

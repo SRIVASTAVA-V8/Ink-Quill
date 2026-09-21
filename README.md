@@ -1,6 +1,6 @@
 # 📚 Ink&Quill
 
-> **Books for Brighter Tomorrows**
+> **Discover Your Next Great Read**
 
 Ink&Quill is a full-stack online bookstore built with **Angular, Node.js, Express.js, and MongoDB**. It provides a complete e-commerce workflow — from discovering books and managing a shopping cart to checkout, payments, inventory management, and viewing order history.
 

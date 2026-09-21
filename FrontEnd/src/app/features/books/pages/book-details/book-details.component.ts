@@ -28,7 +28,6 @@ book: Book | null = null;
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
     const bookId = params.get('id');
-
     if (bookId) {
       this.loadBookDetails(bookId);
     }
@@ -38,7 +37,6 @@ book: Book | null = null;
   loadBookDetails(bookId: string): void {
 
     this.loadingBook = true;
-
     this.book = null;
 
     this.bookService.getBook(bookId).subscribe({
@@ -46,6 +44,7 @@ book: Book | null = null;
       next: (book) => {
 
         this.book = book;
+        console.log(book);
 
         this.loadingBook = false;
 
