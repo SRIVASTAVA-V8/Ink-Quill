@@ -7,6 +7,7 @@ import { ClickOutsideDirective } from './directives/click-outside.directive';
 import { RouterModule } from '@angular/router';
 import { SearchComponent } from './components/search/search.component';
 import { FormsModule } from '@angular/forms';
+import { ToastComponent } from './toast/toast.component';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { FormsModule } from '@angular/forms';
     FooterComponent,
     BookCardComponent,
     SearchComponent,
-    ClickOutsideDirective
+    ClickOutsideDirective,
+    ToastComponent
   ],
   imports: [
     CommonModule,
@@ -26,7 +28,8 @@ import { FormsModule } from '@angular/forms';
     NavbarComponent,
     FooterComponent,
     BookCardComponent,
-    SearchComponent
+    SearchComponent,
+    ToastComponent
   ]
 })
 export class SharedModule { }

@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { Book } from '../../../../models/book.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
-
+import { NotificationService } from 'src/app/services/notification.service';
 @Component({
   selector: 'app-wishlist',
   templateUrl: './wishlist.component.html',
@@ -21,6 +21,7 @@ export class WishlistComponent implements OnInit {
   constructor(
     private wishlistService: WishlistService,
     private cartService: CartService,
+    private NotificationService:NotificationService,
     private router: Router
   ) {}
 
@@ -95,9 +96,11 @@ export class WishlistComponent implements OnInit {
 
     this.cartService.addToCart(bookId, 1).subscribe({
       next: () => {
+        this.NotificationService.success("Added to Cart");
         console.log('Added to cart:', bookId);
       },
       error: error => {
+        this.NotificationService.error("Failed to add book to cart");
         console.error('Failed to add book to cart:', error);
       }
     });
@@ -111,9 +114,11 @@ export class WishlistComponent implements OnInit {
     this.wishlistService.removeFromWishlist(bookId).subscribe({
         next: (wishlist) => {
           this.wishlist = wishlist;
+          this.NotificationService.success("Removed from wishlist");
           console.log('Removed from wishlist:', bookId);
         },
         error: error => {
+          this.NotificationService.error("Failed to remove from wishlist");
           console.error('Failed to remove from wishlist:', error);
       }
     });
@@ -123,9 +128,11 @@ export class WishlistComponent implements OnInit {
     if (confirm('Are you sure you want to clear your entire wishlist?')) {
       this.wishlistService.clearWishlist().subscribe({
         next: () => {
+          this.NotificationService.success("Wishlist cleared successfully");
           console.log('Wishlist cleared successfully');
         },
         error: (error) => {
+          this.NotificationService.error("Failed to clear wishlist");
           console.error('Failed to clear wishlist:', error);
         }
       });
@@ -154,10 +161,12 @@ export class WishlistComponent implements OnInit {
 
     forkJoin(cartRequests).subscribe({
       next: () => {
+        this.NotificationService.success("All wishlist items added to cart")
         console.log('All wishlist items added to cart');
         this.router.navigate(['/cart']);
       },
       error: error => {
+        this.NotificationService.error("Failed to add all wishlist items to cart")
         console.error('Failed to add all wishlist items to cart:', error);
       }
     });

@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { Book } from 'src/app/models/book.model';
 import { CartService } from 'src/app/services/cart.service';
 import { WishlistService } from 'src/app/services/wishlist.service';
-
+import { NotificationService } from 'src/app/services/notification.service';  
 @Component({
   selector: 'app-book-card',
   templateUrl: './book-card.component.html',
@@ -26,9 +26,11 @@ export class BookCardComponent implements OnDestroy {
   isInWishlist = false;
   private wishlistSubscription?: Subscription;
 
+
   constructor(
   private cartService: CartService,
-  private wishlistService: WishlistService
+  private wishlistService: WishlistService,
+  private notificationService: NotificationService
 ) {
 
   this.wishlistSubscription = this.wishlistService.wishlist$
@@ -83,11 +85,12 @@ export class BookCardComponent implements OnDestroy {
             action: 'add-to-cart',
             bookId: this.book._id
           });
-
+          this.notificationService.success('Book added to cart successfully!');
+         
         },
 
         error: error => {
-
+          this.notificationService.error('Failed to add book to cart');
           console.error(
             'Failed to add book to cart:',
             error
@@ -106,13 +109,23 @@ export class BookCardComponent implements OnDestroy {
 
       this.wishlistService
         .removeFromWishlist(this.book._id)
-        .subscribe();
+        .subscribe({
+          next:()=>{
+            this.notificationService.success('Book removed from wishlist successfully');
+
+          }
+        });
 
     } else {
 
       this.wishlistService
         .addToWishlist(this.book._id)
-        .subscribe();
+        .subscribe(
+          {next:()=>{
+         this.notificationService.success('Book added to  wishlist successfully');
+          } 
+        }
+        );
 
     }
 
@@ -137,7 +150,7 @@ export class BookCardComponent implements OnDestroy {
       this.cartQuantityChange.emit(
         this.cartQuantity + 1
       );
-
+      
     }
 
   }
@@ -150,7 +163,6 @@ export class BookCardComponent implements OnDestroy {
       this.cartQuantityChange.emit(
         this.cartQuantity - 1
       );
-
     }
 
   }

@@ -35,7 +35,8 @@ authMiddleware.validateGuestSession = async(req, res, next) => {
     let sessionId = req.cookies['sessionId'];
     if (!sessionId) {
         sessionId = uuidv4();
-        res.cookie('sessionId', sessionId, { httpOnly: true,secure:false, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 1 week
+        const isProduction = process.env.NODE_ENV === 'production';
+        res.cookie('sessionId', sessionId, { httpOnly: true, secure: isProduction,sameSite: isProduction ? 'none' : 'lax', maxAge: 7 * 24 * 60 * 60 * 1000 }); // 1 week
        console.log('New guest session created:', sessionId);
     } else {
         console.log('Existing guest session:', sessionId);

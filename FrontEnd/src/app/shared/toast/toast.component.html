@@ -1,0 +1,52 @@
+<div
+  *ngIf="notification"
+  class="fixed top-6 right-6 z-[9999] w-[calc(100%-2rem)] max-w-sm"
+>
+  <div
+    class="flex items-start gap-3 rounded-xl border bg-white px-4 py-3 shadow-lg"
+    [ngClass]="{
+      'border-green-200': notification.type === 'success',
+      'border-red-200': notification.type === 'error',
+      'border-blue-200': notification.type === 'info'
+    }"
+  >
+
+    <!-- Icon -->
+    <div
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+      [ngClass]="{
+        'bg-green-50 text-green-600': notification.type === 'success',
+        'bg-red-50 text-red-600': notification.type === 'error',
+        'bg-blue-50 text-blue-600': notification.type === 'info'
+      }"
+    >
+      <span class="material-icons text-[20px]">
+        {{
+          notification.type === 'success'
+            ? 'check'
+            : notification.type === 'error'
+              ? 'close'
+              : 'info'
+        }}
+      </span>
+    </div>
+
+    <!-- Message -->
+    <p class="flex-1 pt-1 text-sm font-medium text-heading">
+      {{ notification.message }}
+    </p>
+
+    <!-- Close -->
+    <button
+      type="button"
+      (click)="close()"
+      class="text-muted transition hover:text-heading"
+      aria-label="Close notification"
+    >
+      <span class="material-icons text-[18px]">
+        close
+      </span>
+    </button>
+
+  </div>
+</div>

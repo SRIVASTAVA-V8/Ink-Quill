@@ -6,7 +6,7 @@ import { OrderService, PaymentMethod } from '../../../../services/order.service'
 import { AuthService } from '../../../../services/auth.service';
 import { Address, Pricing} from '../../../../models/order.model';
 import { Cart } from '../../../../models/cart.model';
-
+import { NotificationService } from 'src/app/services/notification.service';
 declare var Razorpay: any;
 
 @Component({
@@ -65,13 +65,12 @@ export class CheckoutComponent implements OnInit {
     tax: 0,
     total: 0
   }
-  successMessage =""
-
   constructor(
     private fb: FormBuilder,
     private cartService: CartService,
     private orderService: OrderService,
     private authService: AuthService,
+    private NotificationService:NotificationService,
     private router: Router
   ) {
     this.checkoutForm = this.fb.group({
@@ -238,13 +237,13 @@ export class CheckoutComponent implements OnInit {
       if (paymentMethod === 'COD') {
         this.processing = false;
 
-         this.successMessage = 'Order placed successfully. You will pay on delivery.';
+         this.NotificationService.success('Order placed successfully. You will pay on delivery.');
          return ;
       }
 
       if (!response.razorpay) {
         this.processing = false;
-        alert('Unable to initialize payment.');
+        this.NotificationService.error('Unable to initialize payment.');
         return;
       }
 
@@ -256,16 +255,15 @@ export class CheckoutComponent implements OnInit {
 
     error: error => {
       this.processing = false;
-
-      console.error(
+       this.NotificationService.error("Checkout Failed");
+      console.error(   
         'Checkout failed:',
         error
       );
-
-      alert(
-        error?.error?.message ||
-        'Unable to place your order. Please try again.'
-      );
+      // alert(
+      //   error?.error?.message ||
+      //   'Unable to place your order. Please try again.'
+      // );
     }
   });
 }
@@ -347,11 +345,12 @@ openRazorpay(
         this.orderService
           .paymentFailed(orderId)
           .subscribe({
-            error: error =>
+            error: error =>{
+              this.NotificationService.error('Failed to mark payment');
               console.error(
                 'Failed to mark payment:',
                 error
-              )
+              )}
           });
 
       }

@@ -7,6 +7,7 @@ import {
 import { CartService } from 'src/app/services/cart.service';
 import { Cart } from 'src/app/models/cart.model';
 import { Router } from '@angular/router';
+import { NotificationService } from 'src/app/services/notification.service';
 
 import { Subscription } from 'rxjs';
 
@@ -47,7 +48,8 @@ export class CartComponent
 
   constructor(
     private cartService: CartService,
-    private router: Router
+    private router: Router,
+    private NotificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -83,7 +85,7 @@ export class CartComponent
 
 
           error: (error) => {
-
+             this.NotificationService.error('Failed to load Cart');
             console.error(
               'Failed to load cart:',
               error
@@ -117,13 +119,14 @@ export class CartComponent
       .subscribe({
 
         next: (updatedCart) => {
+          this.NotificationService.success('Quantity Updated Successfully');
           this.cart = updatedCart;
 
         },
 
 
         error: (error) => {
-
+          this.NotificationService.error('Failed to Update Quantity');
           console.error(
             'Failed to update quantity:',
             error
@@ -147,15 +150,15 @@ export class CartComponent
       .subscribe({
 
         next: (updatedCart) => {
-
+          this.NotificationService.success("Book removed from cart Successfully");
           this.cart = updatedCart;
 
         },
 
 
         error: (error) => {
-
-          console.error(
+          this.NotificationService.error("Failed to remove item");
+          console.error(       
             'Failed to remove item:',
             error
           );
@@ -259,9 +262,11 @@ clearCart(): void {
   if (confirm('Are you sure you want to clear your cart?')) {
     this.cartService.clearCart().subscribe({
       next: () => {
+        this.NotificationService.success("Cart Cleared Successfully");
         console.log('Cart cleared successfully');
       },
       error: error => {
+        this.NotificationService.success("Failed to Clear Cart");
         console.error('Failed to clear cart:', error);
       }
     });
