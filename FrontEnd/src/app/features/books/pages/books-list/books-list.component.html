@@ -127,6 +127,47 @@
 
       </div>
 
+      <div *ngIf="!loading && !error && totalPages > 1" class="flex items-center justify-center gap-2 mt-12">
+       <!-- Previous -->
+        <button
+          type="button"
+          (click)="goToPreviousPage()"
+           [disabled]="currentPage === 1"
+           class="px-4 py-2 border border-border text-primary bg-surface
+           hover:border-secondary hover:text-secondary
+           disabled:opacity-40 disabled:cursor-not-allowed
+           transition-colors duration-200" >  ←
+        </button>
+
+  <!-- Page Numbers -->
+  <button
+    *ngFor="let page of getPages()"
+    type="button"
+    (click)="goToPage(page)"
+    class="w-10 h-10 border transition-colors duration-200"
+    [ngClass]="
+      page === currentPage
+        ? 'bg-primary text-white border-primary'
+        : 'bg-surface text-primary border-border hover:border-secondary hover:text-secondary'
+    "
+  >
+    {{ page }}
+  </button>
+
+  <!-- Next -->
+  <button
+    type="button"
+    (click)="goToNextPage()"
+    [disabled]="currentPage === totalPages"
+    class="px-4 py-2 border border-border text-primary bg-surface
+           hover:border-secondary hover:text-secondary
+           disabled:opacity-40 disabled:cursor-not-allowed
+           transition-colors duration-200"
+  >
+    →
+  </button>
+</div>
+
 
       <!-- ================================================= -->
       <!-- EMPTY STATE -->

@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-background px-4 py-8 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-secondary">Account</p>
+        <h1 class="text-3xl font-bold text-heading md:text-4xl">My Orders</h1>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="flex justify-center py-16">
+      <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+    </div>
+
+    <div *ngIf="!loading && error" class="rounded-xl border border-red-200 bg-red-50 p-5 text-red-700">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error && orders.length === 0" class="rounded-2xl border border-border bg-surface p-10 text-center shadow-sm">
+      <div class="mb-4 text-5xl">📦</div>
+      <h2 class="mb-2 text-2xl font-semibold text-heading">No orders yet</h2>
+      <p class="mb-6 text-body">Your completed purchases will appear here.</p>
+      <button routerLink="/books" class="bg-primary px-6 py-3 font-semibold text-white transition hover:bg-[#1B2639]">
+        Browse Books
+      </button>
+    </div>
+
+    <div *ngIf="!loading && orders.length > 0" class="space-y-6">
+      <div *ngFor="let order of orders" class="rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 border-b border-border pb-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted">Order ID</p>
+            <p class="mt-1 text-lg font-semibold text-heading">#{{ order._id.slice(-8) }}</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <span [ngClass]="getStatusClasses(order.orderStatus)" class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+              {{ order.orderStatus }}
+            </span>
+            <span class="text-sm text-muted">{{ order.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-5 md:grid-cols-3">
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted">Items</p>
+            <p class="mt-1 font-medium text-heading">{{ getTotalItems(order) }} books</p>
+          </div>
+
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted">Total</p>
+            <p class="mt-1 font-medium text-heading">{{ formatCurrency(order.pricing.total || 0) }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted">Payment</p>
+            <p class="mt-1 font-medium text-heading">{{ order.paymentInfo.method || 'N/A' }}</p>
+          </div>
+        </div>
+
+        <div class="mt-5 flex flex-wrap items-center gap-3">
+          <button
+            [routerLink]="['/orders', order._id]"
+            class="bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1B2639]"
+          >
+            View Details
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && pagination.pages > 1" class="mt-8 flex items-center justify-center gap-3">
+      <button
+        type="button"
+        (click)="goToPage(page - 1)"
+        [disabled]="page === 1"
+        class="rounded border border-border px-4 py-2 text-sm font-medium text-body disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Previous
+      </button>
+
+      <span class="text-sm font-medium text-heading">Page {{ page }} of {{ pagination.pages }}</span>
+
+      <button
+        type="button"
+        (click)="goToPage(page + 1)"
+        [disabled]="page === pagination.pages"
+        class="rounded border border-border px-4 py-2 text-sm font-medium text-body disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>

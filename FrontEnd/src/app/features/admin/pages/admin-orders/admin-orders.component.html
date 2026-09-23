@@ -1,0 +1,107 @@
+<section class="space-y-6">
+  <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-secondary">Fulfillment</p>
+        <h2 class="mt-2 text-2xl font-bold text-heading">Order Management</h2>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="shippingOrder" class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+    <div class="mb-4 flex items-center justify-between">
+      <h3 class="text-xl font-bold text-heading">Shipping Update</h3>
+      <button type="button" (click)="shippingOrder = null" class="text-sm font-medium text-muted">Close</button>
+    </div>
+
+    <form (ngSubmit)="updateShipping()" class="grid gap-4 md:grid-cols-3">
+      <label class="flex flex-col gap-2 text-sm font-medium text-body">
+        Carrier
+        <input [(ngModel)]="shippingForm.carrier" name="carrier" type="text" class="rounded border border-border bg-background px-3 py-2 text-body" required />
+      </label>
+
+      <label class="flex flex-col gap-2 text-sm font-medium text-body">
+        Tracking Number
+        <input [(ngModel)]="shippingForm.trackingNumber" name="trackingNumber" type="text" class="rounded border border-border bg-background px-3 py-2 text-body" required />
+      </label>
+
+      <label class="flex flex-col gap-2 text-sm font-medium text-body">
+        Estimated Delivery
+        <input [(ngModel)]="shippingForm.estimatedDeliveryDate" name="estimatedDeliveryDate" type="date" class="rounded border border-border bg-background px-3 py-2 text-body" required />
+      </label>
+
+      <div class="md:col-span-3 flex justify-end gap-3">
+        <button type="button" (click)="shippingOrder = null" class="rounded border border-border px-4 py-2 text-sm font-semibold text-body">Cancel</button>
+        <button type="submit" class="rounded bg-primary px-5 py-2 text-sm font-semibold text-white">Save Shipping</button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="loading" class="flex justify-center py-12">
+    <div class="h-10 w-10 animate-spin rounded-full border-b-2 border-primary"></div>
+  </div>
+
+  <div *ngIf="!loading && error" class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error" class="space-y-4">
+    <div *ngFor="let order of orders" class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+      <div class="flex flex-col gap-4 border-b border-border pb-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p class="text-xs uppercase tracking-[0.18em] text-muted">Order ID</p>
+          <p class="mt-1 text-lg font-semibold text-heading">#{{ order._id.slice(-8) }}</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <span [ngClass]="getStatusClasses(order.orderStatus)" class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+            {{ order.orderStatus }}
+          </span>
+          <button
+            *ngIf="order.orderStatus !== 'delivered'"
+            type="button"
+            (click)="markDelivered(order)"
+            class="rounded bg-primary px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1B2639]"
+          >
+            Mark Delivered
+          </button>
+          <button
+            type="button"
+            (click)="openShippingForm(order)"
+            class="rounded border border-border px-3 py-1.5 text-xs font-semibold text-body transition hover:border-primary hover:text-primary"
+          >
+            Shipping Info
+          </button>
+          <button
+            type="button"
+            (click)="trackShipping(order)"
+            class="rounded border border-border px-3 py-1.5 text-xs font-semibold text-body transition hover:border-primary hover:text-primary"
+          >
+            Track
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-5 grid gap-5 md:grid-cols-3">
+        <div>
+          <p class="text-xs uppercase tracking-wider text-muted">Customer</p>
+          <p class="mt-1 font-medium text-heading">
+            {{ getCustomerName(order) }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-xs uppercase tracking-wider text-muted">Items</p>
+          <p class="mt-1 font-medium text-heading">{{ order.items?.length || 0 }}</p>
+        </div>
+
+        <div>
+          <p class="text-xs uppercase tracking-wider text-muted">Total</p>
+          <p class="mt-1 font-medium text-heading">
+            {{ formatCurrency(order.pricing?.total ?? order.totalAmount ?? 0) }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

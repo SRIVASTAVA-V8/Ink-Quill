@@ -168,7 +168,7 @@ orderService.getOrderHistory = async (
 
   const [orders, total] =
     await Promise.all([
-      dblayer.getOrdersByUserId(
+      dblayer.getOrderHistory(
         userId,
         page,
         limit,

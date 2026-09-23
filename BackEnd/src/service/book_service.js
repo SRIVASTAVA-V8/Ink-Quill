@@ -72,7 +72,16 @@ if (
 
     try{
         const books = await dblayer.getBooks(filter,sort, page, limit,skip);
-        return {warningMessage, books};
+        const totalBooks = await dblayer.countBooks(filter);
+        const totalPages =Math.ceil(totalBooks/limit);
+        return {warningMessage, books,
+            pagination: {
+                currentPage: page,
+                limit,
+                totalBooks,
+                totalPages
+            }
+        };
     }
     catch(error){
         throw error;

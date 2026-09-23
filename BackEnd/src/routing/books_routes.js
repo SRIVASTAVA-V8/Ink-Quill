@@ -26,7 +26,7 @@ routing.get ('/:collection',async (req, res) => {
      const {category,search,language,author,min_price,max_price,sortby,exclude} = req.query;
      let collection=req.params.collection;    
      const page = parseInt(req.query.page) || 1;
-     limit = parseInt(req.query.limit) || 10;   
+     const limit = parseInt(req.query.limit) || 10;   
      try{
        const books = await service.getBooks({ collection, category, search, language, author, min_price, max_price, sortby, exclude, page, limit });
         res.status(200).json(books);

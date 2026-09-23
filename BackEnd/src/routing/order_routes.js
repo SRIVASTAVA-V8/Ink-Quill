@@ -11,7 +11,7 @@ routing.get('/history', async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     try {
         const orders = await service.getOrderHistory(userId, page, limit);     
-        res.status(200).json({ orders });
+        res.status(200).json(orders);
     } catch (error) {
         console.log(error);
         res.status(400).json({ message: error.message });

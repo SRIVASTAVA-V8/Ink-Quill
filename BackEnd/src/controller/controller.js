@@ -19,6 +19,11 @@ dblayer.getProfile = async (userId) => {
     return await newUser.save();
 };
 
+dblayer.countBooks = async (filter) => {
+
+  return await Book.countDocuments(filter);
+
+}
 dblayer.getBooks = async (filter, sort, page, limit, skip) => {
     return await Book.find(filter)
     .sort(sort || { createdAt: -1 })
@@ -139,7 +144,9 @@ dblayer.confirmRazorpayPayment = async (
 dblayer.markPaymentFailed = async (orderId) => {
   return await Order.findByIdAndUpdate(
     orderId,
-    { $set: {'paymentInfo.status': 'failed'} },
+    { $set: {'paymentInfo.status': 'failed',
+              'orderrStatus':'Cancelled'
+    },},
     { new: true }
   );
 };
@@ -256,9 +263,9 @@ dblayer.getOrderById = async (orderId) => {
 dblayer.updateOrderStatus = async (orderId, orderStatus) => {
     return await Order.findByIdAndUpdate(
         orderId,
-        { $set: { orderStatus } },
+        { $set:  orderStatus },
         { new: true }
-    ).select('_id orderStatus shippingInfo deliveredAt');
+    );
 };
 
 dblayer.updateShippingInfo = async (orderId, shippingData) => {
@@ -280,16 +287,29 @@ dblayer.updateShippingInfo = async (orderId, shippingData) => {
 };
 
 dblayer.markOrderDelivered = async (orderId) => {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+        return null;
+    }
+
+    const update = {
+        orderStatus: 'delivered',
+        deliveredAt: new Date()
+    };
+    if (
+        order.paymentInfo?.method === 'COD' &&
+        order.paymentInfo?.status === 'pending'
+    ) {
+        update['paymentInfo.status'] = 'paid';
+        update['paymentInfo.paidAt'] = new Date();
+    }
+
     return await Order.findByIdAndUpdate(
         orderId,
-        { 
-            $set: { 
-                orderStatus: 'delivered',
-                deliveredAt: new Date()
-            }
-        },
+        { $set: update },
         { new: true }
-    ).select('_id orderStatus shippingInfo deliveredAt');
+    );
 };
 
 dblayer.getOrderShippingTrack = async (orderId) => {

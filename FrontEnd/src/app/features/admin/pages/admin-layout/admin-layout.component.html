@@ -1,0 +1,28 @@
+<div class="min-h-screen bg-background text-body">
+  <div class="border-b border-border bg-surface shadow-sm">
+    <div class="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-secondary">Control Center</p>
+          <h1 class="mt-2 text-3xl font-bold text-heading">Admin Panel</h1>
+        </div>
+
+        <nav class="flex flex-wrap gap-2">
+          <a
+            *ngFor="let item of navItems"
+            [routerLink]="item.route"
+            routerLinkActive="bg-primary text-white"
+            [routerLinkActiveOptions]="{ exact: false }"
+            class="rounded-full border border-border px-4 py-2 text-sm font-medium text-body transition hover:border-primary hover:text-primary"
+          >
+            {{ item.label }}
+          </a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <router-outlet></router-outlet>
+  </main>
+</div>

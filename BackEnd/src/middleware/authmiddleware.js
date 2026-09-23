@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 dotenv.config();
  let authMiddleware = {};
  authMiddleware.validateToken = async (req, res, next) => {
+    console.log('request payload',req);
     const authHeader = req.headers['authorization'] || req.headers['Authorization'];
     if (!authHeader) {
         return res.status(401).json({ message: 'Access denied. No token provided.' });
@@ -18,7 +19,7 @@ dotenv.config();
     }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = await User.findById(decoded.userId).select('_id, name, email ,role'); // Fetch user details from DB
+        req.user = await User.findById(decoded.userId).select('_id name email role'); // Fetch user details from DB
         console.log(req.user);
         next();
     } catch (error) {
@@ -78,6 +79,7 @@ authMiddleware.optionalAuth = async (req, res, next) => {
   next();
 };
 authMiddleware.checkAdminRole = (req, res, next) => {
+    console.log('CHecking Admin',req.user.role);
     if (req.user && req.user.role === 'admin') {
         return next();
     }   

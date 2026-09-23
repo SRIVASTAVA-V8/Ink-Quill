@@ -1,0 +1,94 @@
+<section class="space-y-6">
+  <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-secondary">Overview</p>
+        <h2 class="mt-2 text-2xl font-bold text-heading">Dashboard</h2>
+      </div>
+      <button
+        type="button"
+        (click)="loadSummary()"
+        class="rounded bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1B2639]"
+      >
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="flex justify-center py-12">
+    <div class="h-10 w-10 animate-spin rounded-full border-b-2 border-primary"></div>
+  </div>
+
+  <div *ngIf="!loading && error" class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error" class="space-y-6">
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <p class="text-sm uppercase tracking-wide text-muted">Users</p>
+        <p class="mt-4 text-3xl font-bold text-heading">{{ summary.userCount }}</p>
+        <p class="mt-2 text-xs text-muted">Total registered readers</p>
+      </div>
+
+      <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <p class="text-sm uppercase tracking-wide text-muted">Admins</p>
+        <p class="mt-4 text-3xl font-bold text-heading">{{ summary.adminCount }}</p>
+        <p class="mt-2 text-xs text-muted">Managing access roles</p>
+      </div>
+
+      <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <p class="text-sm uppercase tracking-wide text-muted">Orders</p>
+        <p class="mt-4 text-3xl font-bold text-heading">{{ summary.orderCount }}</p>
+        <p class="mt-2 text-xs text-muted">Completed and active orders</p>
+      </div>
+
+      <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <p class="text-sm uppercase tracking-wide text-muted">Revenue</p>
+        <p class="mt-4 text-2xl font-bold text-heading">{{ formatCurrency(summary.totalRevenue) }}</p>
+        <p class="mt-2 text-xs text-muted">Gross marketplace revenue</p>
+      </div>
+    </div>
+
+    <div class="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+      <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <div class="mb-6 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-secondary">Analytics</p>
+            <h3 class="mt-2 text-xl font-bold text-heading">Weekly Revenue</h3>
+          </div>
+          <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">+12.5%</span>
+        </div>
+
+        <div class="flex h-52 items-end gap-3">
+          <div *ngFor="let item of revenueTrend" class="flex flex-1 flex-col items-center gap-2">
+            <span class="text-xs font-medium text-muted">{{ formatCurrency(item.value) }}</span>
+            <div
+              class="w-full rounded-t-xl bg-gradient-to-t from-primary to-[#8aa8ff]"
+              [style.height.%]="(item.value / getMaxRevenue()) * 100"
+            ></div>
+            <span class="text-xs font-medium text-muted">{{ item.label }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-secondary">Highlights</p>
+        <div class="mt-5 space-y-4">
+          <div class="rounded-xl bg-background p-4">
+            <p class="text-sm text-muted">Conversion</p>
+            <p class="mt-2 text-2xl font-bold text-heading">18.4%</p>
+          </div>
+          <div class="rounded-xl bg-background p-4">
+            <p class="text-sm text-muted">Avg. order value</p>
+            <p class="mt-2 text-2xl font-bold text-heading">{{ formatCurrency(getAverageOrderValue()) }}</p>
+          </div>
+          <div class="rounded-xl bg-background p-4">
+            <p class="text-sm text-muted">Low stock alerts</p>
+            <p class="mt-2 text-2xl font-bold text-heading">{{ summary.orderCount > 0 ? 4 : 0 }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

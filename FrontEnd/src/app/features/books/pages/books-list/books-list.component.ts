@@ -20,7 +20,9 @@ import { SearchService } from 'src/app/services/search.service';
 export class BooksListComponent implements OnInit, OnDestroy {
   // Final books shown in the UI
   displayedBooks: Book[] = [];
-
+  totalPages = 0;
+  currentPage = 1;
+  pageSize = 12;
   loading = true;
   error = false;
 
@@ -62,11 +64,11 @@ export class BooksListComponent implements OnInit, OnDestroy {
           ...this.currentFilters,
           category: params['category'] || null
         };
+        this.currentPage=1;
 
       }
 
       this.loadBooks();
-
     });
 
 
@@ -78,6 +80,7 @@ export class BooksListComponent implements OnInit, OnDestroy {
       this.searchService.search$.subscribe(term => {
 
         this.searchTerm = term.trim();
+        this.currentPage=1;
 
         this.loadBooks();
 
@@ -116,9 +119,9 @@ export class BooksListComponent implements OnInit, OnDestroy {
         sortby:
           this.mapSortValue(this.currentSort),
 
-        page: 1,
+        page: this.currentPage,
 
-        limit: 12
+        limit: this.pageSize
 
       })
       .subscribe({
@@ -127,6 +130,12 @@ export class BooksListComponent implements OnInit, OnDestroy {
 
           this.displayedBooks =
             response.books;
+
+          this.totalPages =
+           response.pagination.totalPages;
+
+          this.currentPage =
+           response.pagination.currentPage;
 
           this.loading = false;
 
@@ -160,6 +169,7 @@ export class BooksListComponent implements OnInit, OnDestroy {
   applyFilters(filters: any): void {
 
     this.currentFilters = { ...this.currentFilters, ...filters };
+    this.currentPage=1;
 
     this.loadBooks();
 
@@ -173,10 +183,75 @@ export class BooksListComponent implements OnInit, OnDestroy {
   applySort(sort: string): void {
 
     this.currentSort = sort;
+    this.currentPage=1;
 
     this.loadBooks();
 
   }
+
+  goToPage(page: number): void {
+
+  if (
+    page < 1 ||
+    page > this.totalPages ||
+    page === this.currentPage
+  ) {
+    return;
+  }
+
+  this.currentPage = page;
+
+  this.loadBooks();
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+
+}
+
+goToPreviousPage(): void {
+
+  if (this.currentPage > 1) {
+
+    this.currentPage--;
+
+    this.loadBooks();
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
+  }
+
+}
+
+goToNextPage(): void {
+
+  if (this.currentPage < this.totalPages) {
+
+    this.currentPage++;
+
+    this.loadBooks();
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
+  }
+
+}
+
+getPages(): number[] {
+
+  return Array.from(
+    { length: this.totalPages },
+    (_, index) => index + 1
+  );
+
+}
 
   private mapSortValue(
     sort: string

@@ -1,0 +1,153 @@
+<div class="min-h-screen bg-background px-4 py-8 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-5xl">
+    <button
+      type="button"
+      routerLink="/orders"
+      class="mb-8 inline-flex items-center gap-2 text-sm font-medium text-body hover:text-primary transition-colors duration-200"
+    >
+      <span class="text-lg">←</span>
+      Back to Orders
+    </button>
+
+    <div *ngIf="loading" class="flex justify-center py-16">
+      <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+    </div>
+
+    <div *ngIf="!loading && error" class="rounded-xl border border-red-200 bg-red-50 p-5 text-red-700">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error && order" class="space-y-8">
+      <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted">Order</p>
+            <h1 class="mt-1 text-3xl font-bold text-heading">#{{ order._id.slice(-8) }}</h1>
+          </div>
+
+          <span [ngClass]="getStatusClasses(order.orderStatus)" class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+            {{ order.orderStatus }}
+          </span>
+        </div>
+
+        <div class="mt-6 grid gap-5 md:grid-cols-3">
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted">Placed On</p>
+            <p class="mt-1 font-medium text-heading">{{ order.createdAt | date:'mediumDate' }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted">Payment</p>
+            <p class="mt-1 font-medium text-heading">{{ getPaymentLabel(order.paymentInfo.method) }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted">Total</p>
+            <p class="mt-1 font-medium text-heading">{{ formatCurrency(order.pricing.total || 0) }}</p>
+          </div>
+        </div>
+
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            (click)="trackOrder()"
+            [disabled]="trackingLoading"
+            class="bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1B2639] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {{ trackingLoading ? 'Checking...' : 'Track Order' }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="tracking" class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <h2 class="mb-4 text-xl font-bold text-heading">Shipping Status</h2>
+
+        <div class="grid gap-4 md:grid-cols-3">
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted">Status</p>
+            <p class="mt-1 font-medium text-heading">{{ tracking.orderStatus || 'N/A' }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted">Carrier</p>
+            <p class="mt-1 font-medium text-heading">{{ tracking.shippingInfo?.carrier || 'Not assigned yet' }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted">Tracking</p>
+            <p class="mt-1 font-medium text-heading">{{ tracking.shippingInfo?.trackingNumber || 'Pending' }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="tracking.deliveredAt" class="mt-4 text-sm text-success">
+          Delivered on {{ tracking.deliveredAt | date:'mediumDate' }}
+        </div>
+      </div>
+
+      <div class="grid gap-8 lg:grid-cols-2">
+        <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+          <h2 class="mb-4 text-xl font-bold text-heading">Shipping Address</h2>
+
+          <div class="space-y-1 text-body">
+            <p class="font-medium text-heading">{{ order.shippingAddress.fullName }}</p>
+            <p>{{ order.shippingAddress.addressLine }}</p>
+            <p>{{ order.shippingAddress.city }}, {{ order.shippingAddress.state }}</p>
+            <p>{{ order.shippingAddress.country }} - {{ order.shippingAddress.pincode }}</p>
+            <p>{{ order.shippingAddress.phone }}</p>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+          <h2 class="mb-4 text-xl font-bold text-heading">Payment Summary</h2>
+
+          <div class="space-y-3 text-body">
+            <div class="flex items-center justify-between">
+              <span>Subtotal</span>
+              <span>{{ formatCurrency(order.pricing.subtotal || 0) }}</span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span>Delivery Charges</span>
+              <span>{{ formatCurrency(order.pricing.deliveryCharges || 0) }}</span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span>Tax</span>
+              <span>{{ formatCurrency(order.pricing.tax || 0) }}</span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span>Discount</span>
+              <span>-{{ formatCurrency(order.pricing.discount || 0) }}</span>
+            </div>
+
+            <div class="border-t border-border pt-3">
+              <div class="flex items-center justify-between font-semibold text-heading">
+                <span>Total</span>
+                <span>{{ formatCurrency(order.pricing.total || 0) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <h2 class="mb-5 text-xl font-bold text-heading">Items</h2>
+
+        <div class="space-y-4">
+          <div *ngFor="let item of order.items" class="flex flex-col gap-3 rounded-xl border border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p class="font-semibold text-heading">{{ item.title }}</p>
+              <p class="text-sm text-muted">Qty: {{ item.quantity }}</p>
+            </div>
+
+            <div class="text-left sm:text-right">
+              <p class="font-medium text-heading">{{ formatCurrency(item.price) }}</p>
+              <p class="text-sm text-muted">per unit</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -42,6 +42,12 @@ export interface BooksResponse {
   warningMessage?: string | null;
 
   books: Book[];
+  pagination: {
+    currentPage: number;
+    limit: number;
+    totalBooks: number;
+    totalPages: number;
+  };
 
 }
 
