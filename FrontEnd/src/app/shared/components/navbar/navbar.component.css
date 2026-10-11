@@ -1,0 +1,23 @@
+.store-navbar {
+	box-shadow: 0 1px 0 rgba(36, 48, 72, 0.04), 0 8px 24px rgba(36, 48, 72, 0.05);
+}
+
+.store-navbar__inner {
+	align-items: center;
+}
+
+.store-navbar__search {
+	flex: 1 1 18rem;
+	min-width: 14rem;
+	justify-content: center;
+}
+
+.store-navbar__search app-search {
+	width: min(100%, 34rem);
+}
+
+@media (max-width: 767px) {
+	.store-navbar__inner > div {
+		column-gap: 1rem;
+	}
+}

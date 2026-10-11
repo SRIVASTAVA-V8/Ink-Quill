@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../../services/auth.service';
 import { LoginData } from '../../../../models/user.model';
 
@@ -10,7 +10,11 @@ import { LoginData } from '../../../../models/user.model';
   styleUrls: ['./login-form.component.css']
 })
 export class LoginFormComponent {
-  constructor(private router: Router, private auth: AuthService) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private auth: AuthService
+  ) {}
   LoginData: LoginData = {
     email: '',
     password: ''
@@ -20,7 +24,9 @@ export class LoginFormComponent {
   {(this.auth.login( this.LoginData)).subscribe({    
      next: (user) => {
       console.log('Login successful:', user);
-      this.router.navigate(['/']);
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      const safeReturnUrl = returnUrl?.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/';
+      this.router.navigateByUrl(user.role === 'admin' ? '/admin/dashboard' : safeReturnUrl);
     },
     error: (err) => {
       console.error('Login failed:', err);

@@ -187,6 +187,7 @@ dblayer.getDashboardStats = async () => {
     const userCount = await User.countDocuments();
     const adminCount = await User.countDocuments({ role: 'admin' });
     const orderCount = await Order.countDocuments();
+    const totalBooks = await Book.countDocuments();
     const revenueResult = await Order.aggregate([
         { $group: { _id: null, totalRevenue: { $sum: '$totalAmount' } } }
     ]);
@@ -195,7 +196,8 @@ dblayer.getDashboardStats = async () => {
         userCount,
         adminCount,
         orderCount,
-        totalRevenue: revenueResult[0]?.totalRevenue || 0
+        totalRevenue: revenueResult[0]?.totalRevenue || 0,
+        totalBooks: totalBooks
     };
 };
 
@@ -206,6 +208,10 @@ dblayer.getAllBooks = async (page, limit, skip) => {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
+};
+
+dblayer.getAllBooksCount = async () => {
+    return await Book.countDocuments();
 };
 
 dblayer.getBookInventory = async (bookId) => {
@@ -247,10 +253,17 @@ dblayer.updateBookDetails = async (bookId, details) => {
     ).select('_id title author price stock');
 };
 
-dblayer.getLowStockBooks = async (threshold = 10) => {
+dblayer.getLowStockBooks = async (threshold = 10, page = 1, limit = 20) => {
+    const skip = (page - 1) * limit;
     return await Book.find({ stock: { $lt: threshold } })
         .select('_id title author stock category')
-        .sort({ stock: 1 });
+        .sort({ stock: 1 })
+        .skip(skip)
+        .limit(limit);
+};
+
+dblayer.getLowStockBooksCount = async (threshold = 10) => {
+    return await Book.countDocuments({ stock: { $lt: threshold } });
 };
 
 // Shipping Management

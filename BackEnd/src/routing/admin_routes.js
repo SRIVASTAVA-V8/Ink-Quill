@@ -74,10 +74,10 @@ routing.get('/orders', async (req, res) => {
 // Inventory Management Routes
 routing.get('/inventory', async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 20;
-        const books = await adminService.getInventory(page, limit);
-        res.status(200).json({ books });
+        const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+        const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 100);
+        const result = await adminService.getInventory(page, limit);
+        res.status(200).json(result);
     } catch (error) {
         console.log(error);
         res.status(400).json({ message: error.message });
@@ -87,8 +87,10 @@ routing.get('/inventory', async (req, res) => {
 routing.get('/inventory/alerts/low-stock', async (req, res) => {
     try {
         const threshold = parseInt(req.query.threshold) || 10;
-        const lowStockBooks = await adminService.getLowStockAlerts(threshold);
-        res.status(200).json({ lowStockBooks });
+        const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+        const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 100);
+        const result = await adminService.getLowStockAlerts(threshold, page, limit);
+        res.status(200).json(result);
     } catch (error) {
         console.log(error);
         res.status(400).json({ message: error.message });
@@ -167,10 +169,10 @@ routing.post('/inventory/search', async (req, res) => {
     }
 });
 
-// Shipping Management Routes
 routing.get('/orders/:id', async (req, res) => {
     try {
         const order = await adminService.getOrderDetails(req.params.id);
+        console.log(order);
         res.status(200).json({ order });
     } catch (error) {
         console.log(error);

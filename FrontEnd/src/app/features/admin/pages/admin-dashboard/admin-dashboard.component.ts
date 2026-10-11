@@ -14,7 +14,8 @@ export class AdminDashboardComponent implements OnInit {
     userCount: 0,
     adminCount: 0,
     orderCount: 0,
-    totalRevenue: 0
+    totalRevenue: 0,
+    totalBooks: 0
   };
   loading = true;
   error = '';
@@ -68,6 +69,23 @@ export class AdminDashboardComponent implements OnInit {
 
   getMaxRevenue(): number {
     return Math.max(...this.revenueTrend.map((item) => item.value), 1);
+  }
+
+  getChartGeometry(): { points: Array<{ x: number; y: number }>; path: string; areaPath: string } {
+    const maxRevenue = this.getMaxRevenue();
+    const width = 100;
+    const chartTop = 10;
+    const chartBottom = 90;
+    const points = this.revenueTrend.map((item, index) => {
+      const x = this.revenueTrend.length > 1 ? (index / (this.revenueTrend.length - 1)) * width : width / 2;
+      const y = chartBottom - (item.value / maxRevenue) * (chartBottom - chartTop);
+      return { x, y };
+    });
+
+    const path = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(' ');
+    const areaPath = `${path} L ${points.at(-1)?.x ?? width} ${chartBottom} L 0 ${chartBottom} Z`;
+
+    return { points, path, areaPath };
   }
 
   getAverageOrderValue(): number {

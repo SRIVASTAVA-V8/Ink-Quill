@@ -13,6 +13,8 @@ export class AdminUsersComponent implements OnInit {
   users: AdminUser[] = [];
   loading = true;
   error = '';
+  currentPage = 1;
+  pageSize = 10;
 
   constructor(private adminService: AdminService) {}
 
@@ -35,6 +37,21 @@ export class AdminUsersComponent implements OnInit {
           this.error = 'Unable to load users.';
         }
       });
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.users.length / this.pageSize));
+  }
+
+  get visibleUsers(): AdminUser[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.users.slice(start, start + this.pageSize);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
   }
 
   toggleUserStatus(user: AdminUser): void {

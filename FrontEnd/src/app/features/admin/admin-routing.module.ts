@@ -6,7 +6,9 @@ import { AdminLayoutComponent } from './pages/admin-layout/admin-layout.componen
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
 import { AdminOrdersComponent } from './pages/admin-orders/admin-orders.component';
+import { AdminOrderDetailsComponent } from './pages/admin-order-details/admin-order-details.component';
 import { AdminInventoryComponent } from './pages/admin-inventory/admin-inventory.component';
+import { AdminPaymentsComponent } from './pages/admin-payments/admin-payments.component';
 
 const routes: Routes = [
   {
@@ -32,8 +34,22 @@ const routes: Routes = [
         component: AdminOrdersComponent
       },
       {
+        path: 'orders/:id',
+        component: AdminOrderDetailsComponent
+      },
+      {
+        path: 'books',
+        component: AdminInventoryComponent,
+        data: { view: 'books' }
+      },
+      {
         path: 'inventory',
-        component: AdminInventoryComponent
+        component: AdminInventoryComponent,
+        data: { view: 'inventory' }
+      },
+      {
+        path: 'payments',
+        component: AdminPaymentsComponent
       }
     ]
   }

@@ -1,19 +1,14 @@
 <nav
-  class="
-    bg-surface
-    border-b border-border
-    shadow-sm
-    sticky top-0 z-50
-  "
+  class="store-navbar sticky top-0 z-50 border-b border-border bg-surface shadow-sm"
 >
-  <div class="container mx-auto px-6">
+  <div class="store-navbar__inner container mx-auto px-4 sm:px-6">
     
-    <div class="flex items-center h-20">
+    <div class="flex min-h-[72px] flex-wrap items-center gap-x-6 gap-y-3 py-3">
 
       <!-- ==================== LOGO ==================== -->
       <a
   routerLink="/"
-  class="flex-shrink-0 text-2xl font-serif font-bold text-primary"
+  class="flex-shrink-0 whitespace-nowrap text-2xl font-serif font-bold text-primary"
 >
   Ink<span class="text-accent">&</span>Quill
 </a>
@@ -26,7 +21,7 @@
           md:flex
           items-center
           gap-8
-          ml-12
+          ml-2
         "
       >
 
@@ -64,6 +59,7 @@
 
         <!-- Books -->
         <a
+          *ngIf="!isAdmin"
           routerLink="/books"
           routerLinkActive="active-nav"
           class="
@@ -95,8 +91,8 @@
       </div>
 
 
-     <div class="hidden md:flex flex-1 justify-center px-10">
-  <app-search></app-search>
+     <div class="store-navbar__search hidden md:flex">
+       <app-search></app-search>
 </div>
 
 
@@ -105,13 +101,15 @@
         class="
           flex
           items-center
-          gap-5
+          gap-4
           ml-auto
+          flex-shrink-0
         "
       >
 
         <!-- Wishlist -->
         <button
+          *ngIf="!isAdmin"
           type="button"
           routerLink="/wishlist"
           routerLinkActive="text-primary"
@@ -165,6 +163,7 @@
 
         <!-- Cart -->
         <button
+          *ngIf="!isAdmin"
           type="button"
           routerLink="/cart"
           routerLinkActive="text-primary"
@@ -364,6 +363,7 @@
             >
 
               <a
+                *ngIf="!isAdmin"
                 routerLink="/profile"
                 class="
                   block
@@ -379,6 +379,7 @@
               </a>
 
               <a
+                *ngIf="!isAdmin"
                 routerLink="/orders"
                 class="
                   block
@@ -395,7 +396,8 @@
 
               <a
                 *ngIf="isAdmin"
-                routerLink="/admin"
+                routerLink="/admin/dashboard"
+                (click)="closeUserMenu()"
                 class="
                   block
                   px-4

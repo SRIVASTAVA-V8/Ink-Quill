@@ -4,6 +4,7 @@ export interface AdminDashboardSummary {
   userCount: number;
   adminCount: number;
   orderCount: number;
+  totalBooks: number;
   totalRevenue: number;
 }
 
@@ -46,32 +47,52 @@ export interface AdminOrder {
     price?: number;
     title?: string;
   }>;
+  shippingAddress?: {
+    fullName?: string;
+    phone?: string;
+    addressLine?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+    country?: string;
+  };
   orderStatus?: string;
   totalAmount?: number;
   pricing?: {
     total?: number;
     subtotal?: number;
+    discount?: number;
+    deliveryCharges?: number;
+    tax?: number;
   };
   paymentInfo?: {
     method?: string;
     status?: string;
+    razorpayOrderId?: string;
+    razorpayPaymentId?: string;
+    paidAt?: string | Date;
   };
   shippingInfo?: {
     carrier?: string;
     trackingNumber?: string;
     estimatedDeliveryDate?: string | Date;
+    shippedAt?: string | Date;
   };
   createdAt?: string | Date;
+  updatedAt?: string | Date;
+  deliveredAt?: string | Date;
 }
 
 export interface AdminInventoryResponse {
   books: AdminBook[];
-  pagination?: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-  };
+  pagination?: AdminPagination;
+}
+
+export interface AdminPagination {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
 }
 
 export interface AdminBookSearchFilters {

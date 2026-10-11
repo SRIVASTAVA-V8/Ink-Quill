@@ -1,0 +1,78 @@
+<section class="space-y-6">
+  <div>
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-secondary">Finance</p>
+    <h2 class="mt-2 text-2xl font-bold text-heading">Payments</h2>
+    <p class="mt-1 text-sm text-muted">Payment method, status, amount, and transaction reference for each order.</p>
+  </div>
+
+  <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem]">
+    <label class="sr-only" for="payment-search">Search payments</label>
+    <input
+      id="payment-search"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="resetPage()"
+      type="search"
+      placeholder="Search order, customer, or transaction ID"
+      class="rounded border border-border bg-surface px-3 py-2 text-sm text-body"
+    />
+    <label class="sr-only" for="payment-status">Filter payment status</label>
+    <select id="payment-status" [(ngModel)]="statusFilter" (ngModelChange)="resetPage()" class="rounded border border-border bg-surface px-3 py-2 text-sm text-body">
+      <option value="all">All statuses</option>
+      <option value="paid">Paid</option>
+      <option value="pending">Pending</option>
+      <option value="failed">Failed</option>
+      <option value="refunded">Refunded</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="flex justify-center py-12">
+    <div class="h-10 w-10 animate-spin rounded-full border-b-2 border-primary"></div>
+  </div>
+  <div *ngIf="!loading && error" class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{{ error }}</div>
+
+  <div *ngIf="!loading && !error" class="overflow-hidden rounded-xl border border-border bg-surface">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-border text-left">
+        <thead class="bg-background">
+          <tr>
+            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted">Order</th>
+            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted">Customer</th>
+            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted">Method</th>
+            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted">Payment Status</th>
+            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted">Amount</th>
+            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted">Transaction</th>
+            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted">Paid At</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border">
+          <tr *ngFor="let order of visibleOrders">
+            <td class="whitespace-nowrap px-4 py-3">
+              <a [routerLink]="['/admin/orders', order._id]" class="font-semibold text-primary hover:underline">#{{ order._id.slice(-8) }}</a>
+            </td>
+            <td class="px-4 py-3 font-medium text-heading">{{ getCustomerName(order) }}</td>
+            <td class="px-4 py-3 text-body">{{ order.paymentInfo?.method || 'Unknown' }}</td>
+            <td class="px-4 py-3">
+              <span [ngClass]="getStatusClasses(order.paymentInfo?.status)" class="rounded-full px-2.5 py-1 text-xs font-semibold uppercase">
+                {{ order.paymentInfo?.status || 'Unknown' }}
+              </span>
+            </td>
+            <td class="whitespace-nowrap px-4 py-3 font-medium text-heading">{{ formatCurrency(order.pricing?.total ?? order.totalAmount ?? 0) }}</td>
+            <td class="max-w-56 break-all px-4 py-3 text-sm text-body">{{ order.paymentInfo?.razorpayPaymentId || order.paymentInfo?.razorpayOrderId || '—' }}</td>
+            <td class="whitespace-nowrap px-4 py-3 text-sm text-body">{{ order.paymentInfo?.paidAt ? (order.paymentInfo?.paidAt | date:'medium') : '—' }}</td>
+          </tr>
+          <tr *ngIf="filteredOrders.length === 0">
+            <td colspan="7" class="px-4 py-10 text-center text-sm text-muted">No matching payment records.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3">
+      <p class="text-sm text-muted">{{ filteredOrders.length ? (currentPage - 1) * pageSize + 1 : 0 }}–{{ (currentPage - 1) * pageSize + visibleOrders.length }} of {{ filteredOrders.length }} payments</p>
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" class="rounded border border-border px-3 py-1.5 text-sm font-medium text-body disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
+        <span class="min-w-20 text-center text-sm text-body">{{ currentPage }} / {{ totalPages }}</span>
+        <button type="button" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="rounded border border-border px-3 py-1.5 text-sm font-medium text-body disabled:cursor-not-allowed disabled:opacity-40">Next</button>
+      </div>
+    </div>
+  </div>
+</section>

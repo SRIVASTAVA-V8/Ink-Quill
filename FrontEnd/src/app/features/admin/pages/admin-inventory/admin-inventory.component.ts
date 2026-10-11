@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 
 import { AdminService } from 'src/app/services/admin.service';
@@ -22,6 +23,12 @@ export class AdminInventoryComponent implements OnInit {
   stockOperation: StockOperation = 'add';
   stockAdjustValue = 0;
   searchTerm = '';
+  isBooksView = false;
+  isLowStockView = false;
+  page = 1;
+  pageSize = 10;
+  totalItems = 0;
+  totalPages = 1;
 
   bookForm = {
     title: '',
@@ -38,10 +45,14 @@ export class AdminInventoryComponent implements OnInit {
     tags: ''
   };
 
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: AdminService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.loadInventory();
+    this.route.data.subscribe((data) => {
+      this.isBooksView = data['view'] === 'books';
+      this.page = 1;
+      this.loadInventory();
+    });
   }
 
   resetForm(): void {
@@ -125,15 +136,18 @@ export class AdminInventoryComponent implements OnInit {
     });
   }
 
-  loadInventory(): void {
+  loadInventory(page = 1): void {
+    this.isLowStockView = false;
+    this.page = page;
     this.loading = true;
     this.error = '';
 
-    this.adminService.getInventory(1, 20)
+    this.adminService.getInventory(this.page, this.pageSize)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (response) => {
           this.books = response.books || [];
+          this.updatePagination(response.pagination, this.books.length);
         },
         error: (err) => {
           console.error('Failed to load inventory:', err);
@@ -142,15 +156,48 @@ export class AdminInventoryComponent implements OnInit {
       });
   }
 
-  loadLowStockAlerts(): void {
-    this.adminService.getLowStockAlerts(this.threshold).subscribe({
+  loadLowStockAlerts(page = 1): void {
+    this.isLowStockView = true;
+    this.page = page;
+    this.loading = true;
+    this.error = '';
+    this.adminService.getLowStockAlerts(this.threshold, this.page, this.pageSize)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe({
       next: (response) => {
         this.books = response.lowStockBooks || [];
+        this.updatePagination(response.pagination, this.books.length);
       },
       error: (err) => {
         console.error('Failed to load low stock alerts:', err);
+        this.error = 'Unable to load low-stock alerts.';
       }
     });
+  }
+
+  updatePagination(
+    pagination?: { page: number; limit: number; total: number; pages: number },
+    resultCount = this.books.length
+  ): void {
+    if (pagination) {
+      this.totalItems = pagination.total;
+      this.totalPages = Math.max(pagination.pages, 1);
+      return;
+    }
+
+    this.totalItems = (this.page - 1) * this.pageSize + resultCount;
+    this.totalPages = Math.max(resultCount === this.pageSize ? this.page + 1 : this.page, 1);
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) {
+      return;
+    }
+    if (this.isLowStockView) {
+      this.loadLowStockAlerts(page);
+    } else {
+      this.loadInventory(page);
+    }
   }
 
   updateStock(book: AdminBook): void {

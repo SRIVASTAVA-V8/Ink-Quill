@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './features/home/pages/home/home.component';
-// import {AuthGuard} from './guards/auth.guard';
+import { AdminDefaultGuard, AuthGuard } from './guards/auth.guard';
 const routes: Routes = [
 
   {
     path: '',
+    canActivate: [AdminDefaultGuard],
     loadChildren: () =>
       import('./features/home/home.module')
       .then(m => m.HomeModule)
@@ -32,12 +33,14 @@ const routes: Routes = [
   },
   {
     path: 'checkout',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import('./features/checkout/checkout.module')
       .then(m => m.CheckoutModule)
   },
   {
     path: 'orders',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import('./features/orders/orders.module')
       .then(m => m.OrdersModule)

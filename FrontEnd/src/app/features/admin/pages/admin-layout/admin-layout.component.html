@@ -1,28 +1,53 @@
-<div class="min-h-screen bg-background text-body">
-  <div class="border-b border-border bg-surface shadow-sm">
-    <div class="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-secondary">Control Center</p>
-          <h1 class="mt-2 text-3xl font-bold text-heading">Admin Panel</h1>
-        </div>
+<div class="min-h-screen bg-background text-body lg:flex">
+  <aside class="flex w-full shrink-0 flex-col border-b border-border bg-surface lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:border-b-0 lg:border-r">
+    <div class="border-b border-border px-6 py-6">
+      <a routerLink="/admin/dashboard" class="inline-flex flex-col items-start">
+        <span class="text-2xl font-serif font-bold text-primary">Ink<span class="text-accent">&</span>Quill</span>
+        <span class="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">Admin</span>
+      </a>
+    </div>
 
-        <nav class="flex flex-wrap gap-2">
-          <a
-            *ngFor="let item of navItems"
-            [routerLink]="item.route"
-            routerLinkActive="bg-primary text-white"
-            [routerLinkActiveOptions]="{ exact: false }"
-            class="rounded-full border border-border px-4 py-2 text-sm font-medium text-body transition hover:border-primary hover:text-primary"
+    <nav aria-label="Admin navigation" class="flex flex-col gap-1 px-3 py-4 lg:flex-1">
+      <a
+        *ngFor="let item of navItems"
+        [routerLink]="item.route"
+        routerLinkActive="bg-primary text-white"
+        [routerLinkActiveOptions]="{ exact: item.route === '/admin/dashboard' }"
+        class="w-full rounded px-4 py-2.5 text-sm font-medium text-body transition hover:bg-background hover:text-primary"
+      >
+        {{ item.label }}
+      </a>
+    </nav>
+
+    <div class="border-t border-border p-3">
+      <div class="relative" appClickOutside (clickOutside)="closeProfileMenu()">
+        <button
+          type="button"
+          (click)="toggleProfileMenu()"
+          [attr.aria-expanded]="profileMenuOpen"
+          aria-haspopup="menu"
+          class="flex w-full items-center justify-between rounded px-4 py-3 text-left text-sm font-semibold text-heading transition hover:bg-background"
+        >
+          <span class="truncate">{{ adminName }}</span>
+          <span aria-hidden="true" class="ml-3 text-xs">{{ profileMenuOpen ? '▲' : '▼' }}</span>
+        </button>
+        <div *ngIf="profileMenuOpen" role="menu" class="absolute bottom-full left-0 z-50 mb-2 w-full rounded border border-border bg-surface py-1 shadow-lg">
+          <button
+            type="button"
+            (click)="logout()"
+            role="menuitem"
+            class="block w-full px-4 py-2.5 text-left text-sm text-red-700 hover:bg-red-50"
           >
-            {{ item.label }}
-          </a>
-        </nav>
+            Logout
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </aside>
 
-  <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-    <router-outlet></router-outlet>
-  </main>
+  <div class="min-w-0 flex-1">
+    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
 </div>

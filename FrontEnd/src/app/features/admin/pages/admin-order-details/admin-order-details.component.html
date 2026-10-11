@@ -1,0 +1,174 @@
+<section class="space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <a routerLink="/admin/orders" class="text-sm font-semibold text-primary hover:underline">&larr; Back to orders</a>
+      <h2 class="mt-2 text-2xl font-bold text-heading">Order Details</h2>
+      <p *ngIf="order" class="mt-1 break-all text-sm text-muted">Order #{{ order._id }}</p>
+    </div>
+    <span
+      *ngIf="order"
+      [ngClass]="getStatusClasses(order.orderStatus)"
+      class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide"
+    >
+      {{ order.orderStatus || 'Unknown' }}
+    </span>
+  </div>
+
+  <div *ngIf="loading" class="flex justify-center py-12">
+    <div class="h-10 w-10 animate-spin rounded-full border-b-2 border-primary"></div>
+  </div>
+
+  <div *ngIf="!loading && error" class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+    {{ error }}
+  </div>
+
+  <ng-container *ngIf="!loading && order as order">
+    <div class="grid gap-6 lg:grid-cols-2">
+      <section class="rounded-xl border border-border bg-surface p-5 shadow-sm">
+        <h3 class="text-lg font-bold text-heading">Customer</h3>
+        <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+          <div>
+            <dt class="text-muted">Name</dt>
+            <dd class="mt-1 font-medium text-body">{{ customerName }}</dd>
+          </div>
+          <div *ngIf="customerEmail">
+            <dt class="text-muted">Email</dt>
+            <dd class="mt-1 break-all font-medium text-body">{{ customerEmail }}</dd>
+          </div>
+          <div>
+            <dt class="text-muted">Phone</dt>
+            <dd class="mt-1 font-medium text-body">{{ order.shippingAddress?.phone || 'Not provided' }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="rounded-xl border border-border bg-surface p-5 shadow-sm">
+        <h3 class="text-lg font-bold text-heading">Shipping Address</h3>
+        <address class="mt-4 space-y-1 text-sm not-italic text-body">
+          <p class="font-medium">{{ order.shippingAddress?.fullName || customerName }}</p>
+          <p>{{ order.shippingAddress?.addressLine || 'Address not provided' }}</p>
+          <p>
+            {{ order.shippingAddress?.city }}<span *ngIf="order.shippingAddress?.city && order.shippingAddress?.state">, </span>{{ order.shippingAddress?.state }}
+            {{ order.shippingAddress?.pincode }}
+          </p>
+          <p>{{ order.shippingAddress?.country }}</p>
+        </address>
+      </section>
+    </div>
+
+    <section class="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
+      <div class="border-b border-border px-5 py-4">
+        <h3 class="text-lg font-bold text-heading">Items ({{ order.items?.length || 0 }})</h3>
+      </div>
+      <div *ngIf="order.items?.length; else noItems" class="divide-y divide-border">
+        <div *ngFor="let item of order.items" class="grid gap-3 px-5 py-4 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+          <div>
+            <p class="font-semibold text-heading">{{ item.title || item.bookId?.title || 'Book' }}</p>
+            <p *ngIf="item.bookId?.author" class="mt-1 text-sm text-muted">{{ item.bookId.author }}</p>
+          </div>
+          <p class="text-sm text-body">{{ item.quantity || 0 }} &times; {{ formatCurrency(item.price || 0) }}</p>
+          <p class="font-semibold text-heading">{{ formatCurrency((item.quantity || 0) * (item.price || 0)) }}</p>
+        </div>
+      </div>
+      <ng-template #noItems>
+        <p class="px-5 py-4 text-sm text-muted">No item details available.</p>
+      </ng-template>
+    </section>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <section class="rounded-xl border border-border bg-surface p-5 shadow-sm">
+        <h3 class="text-lg font-bold text-heading">Payment</h3>
+        <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+          <div>
+            <dt class="text-muted">Method</dt>
+            <dd class="mt-1 font-medium text-body">{{ order.paymentInfo?.method || 'Not provided' }}</dd>
+          </div>
+          <div>
+            <dt class="text-muted">Status</dt>
+            <dd class="mt-1 font-medium capitalize text-body">{{ order.paymentInfo?.status || 'Unknown' }}</dd>
+          </div>
+          <div *ngIf="order.paymentInfo?.razorpayOrderId" class="sm:col-span-2">
+            <dt class="text-muted">Payment Order ID</dt>
+            <dd class="mt-1 break-all font-medium text-body">{{ order.paymentInfo?.razorpayOrderId }}</dd>
+          </div>
+          <div *ngIf="order.paymentInfo?.razorpayPaymentId" class="sm:col-span-2">
+            <dt class="text-muted">Payment ID</dt>
+            <dd class="mt-1 break-all font-medium text-body">{{ order.paymentInfo?.razorpayPaymentId }}</dd>
+          </div>
+          <div *ngIf="order.paymentInfo?.paidAt">
+            <dt class="text-muted">Paid At</dt>
+            <dd class="mt-1 font-medium text-body">{{ order.paymentInfo?.paidAt | date:'medium' }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="rounded-xl border border-border bg-surface p-5 shadow-sm">
+        <h3 class="text-lg font-bold text-heading">Price Summary</h3>
+        <dl class="mt-4 space-y-3 text-sm">
+          <div class="flex justify-between gap-4">
+            <dt class="text-muted">Subtotal</dt>
+            <dd class="font-medium text-body">{{ formatCurrency(order.pricing?.subtotal || 0) }}</dd>
+          </div>
+          <div class="flex justify-between gap-4">
+            <dt class="text-muted">Discount</dt>
+            <dd class="font-medium text-body">-{{ formatCurrency(order.pricing?.discount || 0) }}</dd>
+          </div>
+          <div class="flex justify-between gap-4">
+            <dt class="text-muted">Delivery</dt>
+            <dd class="font-medium text-body">{{ formatCurrency(order.pricing?.deliveryCharges || 0) }}</dd>
+          </div>
+          <div class="flex justify-between gap-4">
+            <dt class="text-muted">Tax</dt>
+            <dd class="font-medium text-body">{{ formatCurrency(order.pricing?.tax || 0) }}</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-t border-border pt-3 text-base">
+            <dt class="font-bold text-heading">Total</dt>
+            <dd class="font-bold text-heading">{{ formatCurrency(order.pricing?.total ?? order.totalAmount ?? 0) }}</dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <section class="rounded-xl border border-border bg-surface p-5 shadow-sm">
+        <h3 class="text-lg font-bold text-heading">Shipping</h3>
+        <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+          <div>
+            <dt class="text-muted">Carrier</dt>
+            <dd class="mt-1 font-medium text-body">{{ order.shippingInfo?.carrier || 'Not assigned' }}</dd>
+          </div>
+          <div>
+            <dt class="text-muted">Tracking Number</dt>
+            <dd class="mt-1 break-all font-medium text-body">{{ order.shippingInfo?.trackingNumber || 'Not available' }}</dd>
+          </div>
+          <div>
+            <dt class="text-muted">Estimated Delivery</dt>
+            <dd class="mt-1 font-medium text-body">{{ order.shippingInfo?.estimatedDeliveryDate ? (order.shippingInfo?.estimatedDeliveryDate | date:'mediumDate') : 'Not available' }}</dd>
+          </div>
+          <div>
+            <dt class="text-muted">Shipped At</dt>
+            <dd class="mt-1 font-medium text-body">{{ order.shippingInfo?.shippedAt ? (order.shippingInfo?.shippedAt | date:'medium') : 'Not shipped' }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="rounded-xl border border-border bg-surface p-5 shadow-sm">
+        <h3 class="text-lg font-bold text-heading">Order Timeline</h3>
+        <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+          <div>
+            <dt class="text-muted">Placed</dt>
+            <dd class="mt-1 font-medium text-body">{{ order.createdAt ? (order.createdAt | date:'medium') : 'Not available' }}</dd>
+          </div>
+          <div>
+            <dt class="text-muted">Last Updated</dt>
+            <dd class="mt-1 font-medium text-body">{{ order.updatedAt ? (order.updatedAt | date:'medium') : 'Not available' }}</dd>
+          </div>
+          <div *ngIf="order.deliveredAt">
+            <dt class="text-muted">Delivered</dt>
+            <dd class="mt-1 font-medium text-body">{{ order.deliveredAt | date:'medium' }}</dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+  </ng-container>
+</section>

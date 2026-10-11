@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 
 import { AdminService } from 'src/app/services/admin.service';
@@ -13,6 +14,8 @@ export class AdminOrdersComponent implements OnInit {
   orders: AdminOrder[] = [];
   loading = true;
   error = '';
+  currentPage = 1;
+  pageSize = 10;
   shippingOrder: AdminOrder | null = null;
   shippingForm = {
     carrier: '',
@@ -20,7 +23,7 @@ export class AdminOrdersComponent implements OnInit {
     estimatedDeliveryDate: ''
   };
 
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: AdminService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadOrders();
@@ -41,6 +44,21 @@ export class AdminOrdersComponent implements OnInit {
           this.error = 'Unable to load orders.';
         }
       });
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.orders.length / this.pageSize));
+  }
+
+  get visibleOrders(): AdminOrder[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.orders.slice(start, start + this.pageSize);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
   }
 
   openShippingForm(order: AdminOrder): void {
@@ -134,5 +152,8 @@ export class AdminOrdersComponent implements OnInit {
         console.error('Failed to mark order delivered:', err);
       }
     });
+  }
+  openOrderDetails(order: AdminOrder): void {
+    this.router.navigate(['/admin/orders', order._id]);
   }
 }

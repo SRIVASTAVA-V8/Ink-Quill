@@ -49,7 +49,14 @@ adminService.getDashboardSummary = async () => {
 // Inventory management
 adminService.getInventory = async (page = 1, limit = 20) => {
     const skip = (page - 1) * limit;
-    return await dblayer.getAllBooks(page, limit, skip);
+    const [books, total] = await Promise.all([
+        dblayer.getAllBooks(page, limit, skip),
+        dblayer.getAllBooksCount()
+    ]);
+    return {
+        books,
+        pagination: { page, limit, total, pages: Math.ceil(total / limit) }
+    };
 };
 
 adminService.getInventoryDetails = async (bookId) => {
@@ -90,16 +97,23 @@ adminService.updateProductDetails = async (bookId, details) => {
     return book;
 };
 
-adminService.getLowStockAlerts = async (threshold = 10) => {
+adminService.getLowStockAlerts = async (threshold = 10, page = 1, limit = 20) => {
     if (typeof threshold !== 'number' || threshold < 0) {
         throw new Error('Threshold must be a non-negative number');
     }
-    return await dblayer.getLowStockBooks(threshold);
+    const [lowStockBooks, total] = await Promise.all([
+        dblayer.getLowStockBooks(threshold, page, limit),
+        dblayer.getLowStockBooksCount(threshold)
+    ]);
+    return {
+        lowStockBooks,
+        pagination: { page, limit, total, pages: Math.ceil(total / limit) }
+    };
 };
 
 // Shipping Management
 adminService.getOrderDetails = async (orderId) => {
-    const order = await dblayer.getOrderById(orderId);
+    const order = await dblayer.getOrderById(orderId);  
     if (!order) {
         throw new Error('Order not found');
     }

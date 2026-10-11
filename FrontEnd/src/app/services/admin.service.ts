@@ -8,6 +8,7 @@ import {
   AdminBookSearchFilters,
   AdminDashboardSummary,
   AdminInventoryResponse,
+  AdminPagination,
   AdminOrder,
   AdminUser,
 } from '../models/admin.model';
@@ -73,10 +74,12 @@ export class AdminService {
     });
   }
 
-  getLowStockAlerts(threshold = 10): Observable<{ lowStockBooks: AdminBook[] }> {
-    return this.http.get<{ lowStockBooks: AdminBook[] }>(`${this.API_URL}/inventory/alerts/low-stock`, {
+  getLowStockAlerts(threshold = 10, page = 1, limit = 20): Observable<{ lowStockBooks: AdminBook[]; pagination: AdminPagination }> {
+    return this.http.get<{ lowStockBooks: AdminBook[]; pagination: AdminPagination }>(`${this.API_URL}/inventory/alerts/low-stock`, {
       params: {
-        threshold: threshold.toString()
+        threshold: threshold.toString(),
+        page: page.toString(),
+        limit: limit.toString()
       }
     });
   }
